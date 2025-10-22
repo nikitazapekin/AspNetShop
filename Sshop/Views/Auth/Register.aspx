@@ -19,12 +19,12 @@
                             <h3 class="text-center">Регистрация</h3>
                         </div>
                         <div class="card-body">
-                            <!-- Вывод ошибок -->
+                        
                             <asp:Panel ID="pnlErrors" runat="server" Visible="false" CssClass="alert alert-danger">
                                 <asp:Literal ID="ltlErrors" runat="server"></asp:Literal>
                             </asp:Panel>
 
-                            <!-- Форма -->
+                         
                             <div class="mb-3">
                                 <label for="txtFirstName" class="form-label">Имя</label>
                                 <asp:TextBox ID="txtFirstName" runat="server" CssClass="form-control"></asp:TextBox>

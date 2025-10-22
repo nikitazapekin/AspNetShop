@@ -52,6 +52,12 @@ namespace Sshop
                 "success",
                 "~/Views/Auth/Success.aspx"
             );
+
+            routes.MapPageRoute(
+              "TestRoute",
+              "test",
+              "~/Test.aspx"
+          );
         }
     }
 

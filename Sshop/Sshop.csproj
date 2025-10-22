@@ -102,6 +102,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Controller\RegisterCard.ascx" />
+    <Content Include="Test.aspx" />
     <Content Include="Views\Auth\Register.aspx" />
     <Content Include="Views\Auth\Success.aspx" />
     <Content Include="Content\bootstrap-grid.css" />
@@ -187,6 +189,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="Controller\RegisterCard.ascx.cs">
+      <DependentUpon>RegisterCard.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Controller\RegisterCard.ascx.designer.cs">
+      <DependentUpon>RegisterCard.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Test.aspx.cs">
+      <DependentUpon>Test.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Test.aspx.designer.cs">
+      <DependentUpon>Test.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Views\Auth\Register.aspx.cs">
       <DependentUpon>Register.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
