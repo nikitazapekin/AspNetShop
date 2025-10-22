@@ -4,7 +4,7 @@ using System;
 using System.Web.UI;
 using System.Web.UI.WebControls; // Добавляем для WebControls
 
-namespace Sshop
+namespace Sshop.Views.Auth
 {
     public partial class Register : Page
     {

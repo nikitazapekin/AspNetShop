@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Sshop
+namespace Sshop.Views.Auth
 {
 
 

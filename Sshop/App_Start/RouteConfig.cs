@@ -32,28 +32,29 @@ namespace Sshop
 
         private static void RegisterCustomRoutes(RouteCollection routes)
         {
+            // Маршрут для главной страницы
+            routes.MapPageRoute(
+                "HomeRoute",
+                "",
+                "~/Views/Home/Default.aspx"
+            );
+
             // Маршрут для регистрации
             routes.MapPageRoute(
                 "RegisterRoute",
-                "auth/register",
+                "register",
                 "~/Views/Auth/Register.aspx"
             );
 
             // Маршрут для успешной регистрации
             routes.MapPageRoute(
-                "RegisterSuccessRoute",
-                "auth/success",
+                "SuccessRoute",
+                "success",
                 "~/Views/Auth/Success.aspx"
-            );
-
-            // Маршрут по умолчанию
-            routes.MapPageRoute(
-                "DefaultRoute",
-                "{page}",
-                "~/Default.aspx"
             );
         }
     }
 
 
-}
+
+    }
