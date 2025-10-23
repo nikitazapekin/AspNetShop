@@ -46,6 +46,28 @@ namespace WebApplication5
                 "~/Register.aspx"
             );
 
+
+
+            routes.MapPageRoute(
+          "HomepageRoute",
+          "homepage",
+          "~/Homepage.aspx"
+      );
+
+            routes.MapPageRoute(
+       "SignInRoute",
+       "signin",
+       "~/SignIn.aspx"
+   );
+
+
+            routes.MapPageRoute(
+      "SignUp",
+      "signup",
+      "~/SignUp.aspx"
+  );
+
+
             // MVC маршруты ПОСЛЕ Web Forms маршрутов
             routes.MapRoute(
                 name: "Default",
