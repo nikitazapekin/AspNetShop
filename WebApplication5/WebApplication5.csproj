@@ -121,6 +121,13 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controls\SignIn.ascx.cs">
+      <DependentUpon>SignIn.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Controls\SignIn.ascx.designer.cs">
+      <DependentUpon>SignIn.ascx</DependentUpon>
+    </Compile>
     <Compile Include="Controls\SignUp.ascx.cs">
       <DependentUpon>SignUp.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -178,6 +185,7 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
+    <Content Include="Controls\SignIn.ascx" />
     <Content Include="Controls\SignUp.ascx" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />

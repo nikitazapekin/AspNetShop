@@ -46,7 +46,7 @@
         <asp:TextBox ID="txtPhone" runat="server" CssClass="form-control" placeholder="+7 (XXX) XXX-XX-XX"></asp:TextBox>
         <asp:RegularExpressionValidator ID="revPhone" runat="server"
             ControlToValidate="txtPhone" ErrorMessage="Введите корректный номер телефона"
-            ValidationExpression="^(\+7|8)?[\s\-]?\(?[0-9]{3}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$"
+            ValidationExpression="^(\+375|8)?[\s\-]?\(?[0-9]{3}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$"
             Display="Dynamic" CssClass="validator" ValidationGroup="SignUp"></asp:RegularExpressionValidator>
     </div>
 
@@ -88,4 +88,14 @@
         <asp:Button ID="btnReset" runat="server" Text="Очистить" 
             CssClass="btn btn-secondary" CausesValidation="false" OnClick="btnReset_Click" />
     </div>
+
+      <div class="login-redirect" style="margin-top: 20px; text-align: center; padding: 15px; border-top: 1px solid #ddd;">
+        <p style="margin: 0 0 10px 0;">Уже есть аккаунт?</p>
+        <asp:HyperLink ID="hlSignIn" runat="server" 
+            NavigateUrl="https://localhost:44394/signin" 
+            CssClass="btn btn-outline-primary"
+            Text="Войти в аккаунт" />
+    </div>
+
+
 </div>
