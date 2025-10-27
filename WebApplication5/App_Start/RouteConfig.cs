@@ -1,4 +1,5 @@
-﻿using System;
+﻿ 
+using System;
 using System.Collections.Generic;
 using System.Web;
 using System.Web.Mvc;
@@ -19,10 +20,10 @@ namespace WebApplication5
             routes.IgnoreRoute("{*allaspx}", new { allaspx = @".*\.aspx(/.*)?" });
 
 
-         /*   routes.MapPageRoute("HomepageRoute", "homepage", "~/Homepage.aspx");
-            routes.MapPageRoute("SignInRoute", "signin", "~/SignIn.aspx");
-            routes.MapPageRoute("SignUp", "signup", "~/SignUp.aspx");
-         */
+         //  routes.MapPageRoute("HomepageRoute", "homepage", "~/Homepage.aspx");
+           // routes.MapPageRoute("SignInRoute", "signin", "~/SignIn.aspx");
+           // routes.MapPageRoute("SignUp", "signup", "~/SignUp.aspx");
+         
 
             // Сначала определяем конкретные маршруты для MVC
             routes.MapRoute(
@@ -43,12 +44,12 @@ namespace WebApplication5
                 defaults: new { controller = "Account", action = "Index" }
             );
 
-          /*  routes.MapRoute(
-                name: "Default",
-                url: "{controller}/{action}/{id}",
-                defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
-            );
-          */
+      //   routes.MapRoute(
+        //        name: "Default",
+          //      url: "{controller}/{action}/{id}",
+            //    defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
+           // );
+       
             // И только потом Web Forms маршруты
             routes.MapPageRoute("TestRoute", "test", "~/Test.aspx");
             routes.MapPageRoute("DefaultRoute", "", "~/Default.aspx");
@@ -64,3 +65,5 @@ namespace WebApplication5
         }
     }
 }
+
+ 

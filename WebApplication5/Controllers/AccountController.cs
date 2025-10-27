@@ -46,7 +46,7 @@ namespace WebApplication5.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Здесь сохраняем изменения в БД
+             
                 TempData["SuccessMessage"] = "Данные успешно обновлены!";
                 return RedirectToAction("Index");
             }
