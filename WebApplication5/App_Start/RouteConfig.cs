@@ -12,16 +12,15 @@ namespace WebApplication5
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
-            // Игнорировать маршруты для Web Forms страниц
+        
             routes.IgnoreRoute("Test.aspx");
             routes.IgnoreRoute("Default.aspx");
             routes.IgnoreRoute("Products.aspx");
             routes.IgnoreRoute("Register.aspx");
-
-            // Игнорировать все .aspx файлы
+ 
             routes.IgnoreRoute("{*allaspx}", new { allaspx = @".*\.aspx(/.*)?" });
 
-            // Web Forms маршруты ДО MVC маршрутов
+            
             routes.MapPageRoute(
                 "TestRoute",
                 "test",
@@ -34,11 +33,7 @@ namespace WebApplication5
                 "~/Default.aspx"
             );
 
-            routes.MapPageRoute(
-                "ProductsRoute",
-                "products",
-                "~/Products.aspx"
-            );
+       
 
             routes.MapPageRoute(
                 "RegisterRoute",
@@ -68,12 +63,24 @@ namespace WebApplication5
   );
 
 
-           
+
+            routes.MapRoute(
+               name: "Products",
+               url: "products",
+               defaults: new { controller = "Products", action = "Index" }
+           );
+
+
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
             );
+
+
+         
+
+
         }
     }
 }
