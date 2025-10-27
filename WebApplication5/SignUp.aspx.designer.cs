@@ -11,7 +11,7 @@ namespace WebApplication5
 {
 
 
-    public partial class SignUp
+    public partial class SignIn
     {
 
         /// <summary>
@@ -21,15 +21,15 @@ namespace WebApplication5
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlForm form1;
+//        protected global::System.Web.UI.HtmlControls.HtmlForm form1;
 
         /// <summary>
-        /// SignUpControl1 control.
+        /// form1 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::WebApplication5.Controls.SignUp SignUpControl1;
+  //      protected global::System.Web.UI.HtmlControls.HtmlForm form1;
     }
 }

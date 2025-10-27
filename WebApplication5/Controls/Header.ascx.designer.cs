@@ -7,29 +7,29 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WebApplication5
+namespace WebApplication5.Controls
 {
 
 
-    public partial class SignIn
+    public partial class Header
     {
 
         /// <summary>
-        /// form2 control.
+        /// hlSignIn control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlForm form2;
+        protected global::System.Web.UI.WebControls.HyperLink hlSignIn;
 
         /// <summary>
-        /// SignInControl1 control.
+        /// hlSignUp control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::WebApplication5.Controls.SignIn SignInControl1;
+        protected global::System.Web.UI.WebControls.HyperLink hlSignUp;
     }
 }
