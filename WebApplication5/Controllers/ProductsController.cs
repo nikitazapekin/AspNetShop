@@ -8,5 +8,10 @@ namespace WebApplication5.Controllers
         {
             return View();
         }
+
+        public ActionResult Card()
+        {
+            return View();
+        }
     }
 }

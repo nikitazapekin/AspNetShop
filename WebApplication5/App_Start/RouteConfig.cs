@@ -71,6 +71,15 @@ namespace WebApplication5
            );
 
 
+
+            routes.MapRoute(
+            name: "Account",
+            url: "account",
+            defaults: new { controller = "Account", action = "Index" }
+        );
+
+
+
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
