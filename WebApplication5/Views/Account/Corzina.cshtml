@@ -1,0 +1,417 @@
+﻿@model List<WebApplication5.Models.CartItem>
+@{
+    ViewBag.Title = "Корзина";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="cart-container">
+    <div class="cart-header">
+        <h1>Корзина</h1>
+        <p>Товары, которые вы планируете приобрести</p>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="empty-cart">
+            <div class="empty-icon">🛒</div>
+            <h2>Корзина пуста</h2>
+            <p>Добавьте товары из каталога</p>
+            <a href="@Url.Action("Index", "Products")" class="btn-primary">Перейти к покупкам</a>
+        </div>
+    }
+    else
+    {
+        <div class="cart-content">
+            <div class="cart-items">
+                @foreach (var item in Model)
+                {
+                    <div class="cart-item" data-product-id="@item.ProductId">
+                        <div class="item-image">
+                            <img src="@item.ImageUrl" alt="@item.ProductName" />
+                        </div>
+                        <div class="item-details">
+                            <h3 class="item-name">@item.ProductName</h3>
+                            <div class="item-price">@item.Price.ToString("N0") ₽</div>
+                        </div>
+                        <div class="item-quantity">
+                            <button class="quantity-btn minus-btn" onclick="updateQuantity(@item.ProductId, -1)">-</button>
+                            <input type="number" class="quantity-input" value="@item.Quantity" min="1"
+                                   onchange="updateQuantityInput(@item.ProductId, this.value)" />
+                            <button class="quantity-btn plus-btn" onclick="updateQuantity(@item.ProductId, 1)">+</button>
+                        </div>
+                        <div class="item-total">
+                            <span class="total-price">@item.TotalPrice.ToString("N0") ₽</span>
+                        </div>
+                        <button class="remove-btn" onclick="removeFromCart(@item.ProductId)">×</button>
+                    </div>
+                }
+            </div>
+
+            <div class="cart-summary">
+                <div class="summary-card">
+                    <h3>Итого</h3>
+                    <div class="summary-row">
+                        <span>Товары (@Model.Sum(i => i.Quantity) шт.):</span>
+                        <span>@Model.Sum(i => i.TotalPrice).ToString("N0") ₽</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Доставка:</span>
+                        <span>Бесплатно</span>
+                    </div>
+                    <div class="summary-total">
+                        <span>Общая сумма:</span>
+                        <span class="total-amount">@Model.Sum(i => i.TotalPrice).ToString("N0") ₽</span>
+                    </div>
+                    <button class="btn-checkout">Оформить заказ</button>
+                    <a href="@Url.Action("Index", "Products")" class="btn-continue">Продолжить покупки</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .cart-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .cart-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+        .cart-header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .cart-header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+    .empty-cart {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .empty-icon {
+        font-size: 80px;
+        margin-bottom: 20px;
+    }
+
+    .empty-cart h2 {
+        color: #2c3e50;
+        margin-bottom: 10px;
+    }
+
+    .empty-cart p {
+        color: #666;
+        margin-bottom: 30px;
+    }
+
+    .btn-primary {
+        background: #007bff;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: background 0.3s;
+    }
+
+        .btn-primary:hover {
+            background: #0056b3;
+            color: white;
+            text-decoration: none;
+        }
+
+    .cart-content {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 30px;
+    }
+
+    .cart-items {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .cart-item {
+        display: grid;
+        grid-template-columns: 100px 1fr auto auto auto;
+        gap: 15px;
+        align-items: center;
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .item-image img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .item-details {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .item-name {
+        color: #2c3e50;
+        margin: 0;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .item-price {
+        color: #007bff;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    .item-quantity {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .quantity-btn {
+        width: 35px;
+        height: 35px;
+        border: 2px solid #007bff;
+        background: white;
+        color: #007bff;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        transition: all 0.3s;
+    }
+
+        .quantity-btn:hover {
+            background: #007bff;
+            color: white;
+        }
+
+    .quantity-input {
+        width: 60px;
+        height: 35px;
+        border: 2px solid #e9ecef;
+        border-radius: 6px;
+        text-align: center;
+        font-size: 16px;
+    }
+
+    .item-total {
+        font-weight: bold;
+        color: #2c3e50;
+        font-size: 16px;
+    }
+
+    .remove-btn {
+        background: #dc3545;
+        color: white;
+        border: none;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 18px;
+        transition: background 0.3s;
+    }
+
+        .remove-btn:hover {
+            background: #c82333;
+        }
+
+    .cart-summary {
+        position: sticky;
+        top: 100px;
+        height: fit-content;
+    }
+
+    .summary-card {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+        .summary-card h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 20px;
+            text-align: center;
+        }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #f8f9fa;
+        color: #666;
+    }
+
+    .summary-total {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 2px solid #e9ecef;
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    .total-amount {
+        color: #007bff;
+    }
+
+    .btn-checkout {
+        width: 100%;
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 15px;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s;
+        margin-bottom: 15px;
+    }
+
+        .btn-checkout:hover {
+            background: #218838;
+        }
+
+    .btn-continue {
+        display: block;
+        text-align: center;
+        background: #6c757d;
+        color: white;
+        padding: 12px;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: background 0.3s;
+    }
+
+        .btn-continue:hover {
+            background: #545b62;
+            color: white;
+            text-decoration: none;
+        }
+
+    @@media (max-width: 768px) {
+        .cart-content {
+            grid-template-columns: 1fr;
+        }
+
+        .cart-item {
+            grid-template-columns: 80px 1fr;
+            grid-template-areas:
+                "image details"
+                "quantity total"
+                "remove remove";
+            gap: 10px;
+        }
+
+        .item-image {
+            grid-area: image;
+        }
+
+        .item-details {
+            grid-area: details;
+        }
+
+        .item-quantity {
+            grid-area: quantity;
+        }
+
+        .item-total {
+            grid-area: total;
+            text-align: right;
+        }
+
+        .remove-btn {
+            grid-area: remove;
+            justify-self: end;
+        }
+
+        .cart-summary {
+            position: static;
+        }
+    }
+</style>
+
+<script>
+    function updateQuantity(productId, change) {
+        const input = document.querySelector(`.cart-item[data-product-id="${productId}"] .quantity-input`);
+        let newQuantity = parseInt(input.value) + change;
+
+        if (newQuantity < 1) newQuantity = 1;
+
+        input.value = newQuantity;
+        updateCartOnServer(productId, newQuantity);
+    }
+
+    function updateQuantityInput(productId, value) {
+        let quantity = parseInt(value);
+        if (isNaN(quantity) || quantity < 1) {
+            quantity = 1;
+        }
+
+        const input = document.querySelector(`.cart-item[data-product-id="${productId}"] .quantity-input`);
+        input.value = quantity;
+        updateCartOnServer(productId, quantity);
+    }
+
+    function updateCartOnServer(productId, quantity) {
+        // Здесь AJAX запрос к серверу
+        fetch('@Url.Action("UpdateCart", "Account")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ productId: productId, quantity: quantity })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload(); // Перезагружаем для обновления итогов
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function removeFromCart(productId) {
+        if (confirm('Вы уверены, что хотите удалить товар из корзины?')) {
+            fetch('@Url.Action("RemoveFromCart", "Account")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ productId: productId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    }
+</script>

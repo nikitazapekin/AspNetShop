@@ -1,7 +1,212 @@
-﻿
+﻿@model WebApplication5.Models.UserProfile
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Личный кабинет";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Index</h2>
+<div class="account-container">
+    <div class="account-header">
+        <h1>Личный кабинет</h1>
+        <p>Управление вашими данными и заказами</p>
+    </div>
 
+    <div class="account-content">
+        <div class="profile-card">
+            <div class="profile-header">
+                <h2>Профиль пользователя</h2>
+                <a href="@Url.Action("Edit")" class="btn-edit">Редактировать</a>
+            </div>
+
+            <div class="profile-info">
+                <div class="info-row">
+                    <span class="info-label">Имя:</span>
+                    <span class="info-value">@Model.FirstName</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Фамилия:</span>
+                    <span class="info-value">@Model.LastName</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email:</span>
+                    <span class="info-value">@Model.Email</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Телефон:</span>
+                    <span class="info-value">@Model.Phone</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="account-actions">
+            <a href="@Url.Action("Corzina")" class="action-card">
+                <div class="action-icon">🛒</div>
+                <div class="action-text">
+                    <h3>Корзина</h3>
+                    <p>Просмотр и управление корзиной</p>
+                </div>
+            </a>
+
+            <a href="@Url.Action("Edit")" class="action-card">
+                <div class="action-icon">👤</div>
+                <div class="action-text">
+                    <h3>Редактировать профиль</h3>
+                    <p>Изменение личных данных</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .account-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .account-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+        .account-header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .account-header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+    .profile-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+
+    .profile-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        border-bottom: 2px solid #f8f9fa;
+        padding-bottom: 15px;
+    }
+
+        .profile-header h2 {
+            color: #2c3e50;
+            margin: 0;
+            font-size: 24px;
+        }
+
+    .btn-edit {
+        background: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: background 0.3s;
+    }
+
+        .btn-edit:hover {
+            background: #0056b3;
+            color: white;
+            text-decoration: none;
+        }
+
+    .profile-info {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .info-row {
+        display: flex;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #f8f9fa;
+    }
+
+    .info-label {
+        font-weight: bold;
+        color: #2c3e50;
+        width: 120px;
+        font-size: 16px;
+    }
+
+    .info-value {
+        color: #666;
+        font-size: 16px;
+    }
+
+    .account-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .action-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        padding: 25px;
+        text-decoration: none;
+        color: inherit;
+        transition: transform 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+        .action-card:hover {
+            transform: translateY(-3px);
+            text-decoration: none;
+            color: inherit;
+        }
+
+    .action-icon {
+        font-size: 40px;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8f9fa;
+        border-radius: 50%;
+    }
+
+    .action-text h3 {
+        color: #2c3e50;
+        margin: 0 0 5px 0;
+        font-size: 18px;
+    }
+
+    .action-text p {
+        color: #666;
+        margin: 0;
+        font-size: 14px;
+    }
+
+    @@media (max-width: 768px) {
+        .profile-header {
+            flex-direction: column;
+            gap: 15px;
+            text-align: center;
+        }
+
+        .info-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+        }
+
+        .account-actions {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
