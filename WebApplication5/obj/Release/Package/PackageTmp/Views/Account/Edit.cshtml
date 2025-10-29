@@ -1,0 +1,172 @@
+﻿@model WebApplication5.Models.UserProfile
+@{
+    ViewBag.Title = "Редактирование профиля";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="account-container">
+    <div class="account-header">
+        <h1>Редактирование профиля</h1>
+        <p>Обновите ваши личные данные</p>
+    </div>
+
+    <div class="edit-form-container">
+        @using (Html.BeginForm("Edit", "Account", FormMethod.Post, new { @class = "edit-form" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.FirstName, "Имя")
+                @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control", placeholder = "Введите ваше имя" })
+                @Html.ValidationMessageFor(m => m.FirstName)
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.LastName, "Фамилия")
+                @Html.TextBoxFor(m => m.LastName, new { @class = "form-control", placeholder = "Введите вашу фамилию" })
+                @Html.ValidationMessageFor(m => m.LastName)
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Email, "Email")
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", type = "email", placeholder = "Введите ваш email" })
+                @Html.ValidationMessageFor(m => m.Email)
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Phone, "Телефон")
+                @Html.TextBoxFor(m => m.Phone, new { @class = "form-control", placeholder = "+7 (999) 123-45-67" })
+                @Html.ValidationMessageFor(m => m.Phone)
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Password, "Пароль")
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Введите новый пароль" })
+                @Html.ValidationMessageFor(m => m.Password)
+                <small class="form-text">Оставьте пустым, если не хотите менять пароль</small>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-save">Сохранить изменения</button>
+                <a href="@Url.Action("Index")" class="btn-cancel">Отмена</a>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .account-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .account-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+        .account-header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .account-header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+    .edit-form-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        padding: 30px;
+    }
+
+    .edit-form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+        .form-group label {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+    .form-control {
+        padding: 12px 15px;
+        border: 2px solid #e9ecef;
+        border-radius: 6px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+    }
+
+        .form-control:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+    .form-text {
+        color: #6c757d;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .field-validation-error {
+        color: #dc3545;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 10px;
+    }
+
+    .btn-save {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+        .btn-save:hover {
+            background: #0056b3;
+        }
+
+    .btn-cancel {
+        background: #6c757d;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 6px;
+        text-decoration: none;
+        text-align: center;
+        transition: background 0.3s;
+    }
+
+        .btn-cancel:hover {
+            background: #545b62;
+            color: white;
+            text-decoration: none;
+        }
+
+    @@media (max-width: 768px) {
+        .form-actions {
+            flex-direction: column;
+        }
+    }
+</style>

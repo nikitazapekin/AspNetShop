@@ -6,7 +6,7 @@ namespace WebApplication5.Controllers
 {
     public class AccountController : Controller
     {
-        // Временные данные (в реальном приложении - из БД)
+        
         private UserProfile GetCurrentUser()
         {
             return new UserProfile
@@ -14,7 +14,7 @@ namespace WebApplication5.Controllers
                 FirstName = "Иван",
                 LastName = "Петров",
                 Email = "ivan.petrov@example.com",
-                Phone = "+7 (999) 123-45-67",
+                Phone = "+375 29 123-45-67",
                 Password = "password123"
             };
         }
@@ -62,14 +62,14 @@ namespace WebApplication5.Controllers
         [HttpPost]
         public ActionResult UpdateCart(int productId, int quantity)
         {
-            // Здесь обновляем количество товара в корзине
+         
             return Json(new { success = true, message = "Количество обновлено" });
         }
 
         [HttpPost]
         public ActionResult RemoveFromCart(int productId)
         {
-            // Здесь удаляем товар из корзины
+         
             return Json(new { success = true, message = "Товар удален из корзины" });
         }
     }

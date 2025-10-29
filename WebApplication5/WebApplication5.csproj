@@ -269,6 +269,7 @@
     <Content Include="Content\Site.css" />
     <Content Include="Homepage.aspx" />
     <Content Include="ONas.aspx" />
+    <Content Include="publish.xml" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />

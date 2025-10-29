@@ -33,6 +33,14 @@ namespace WebApplication5
                 defaults: new { controller = "Products", action = "Index" }
             );
 
+
+            routes.MapRoute(
+     name: "AccountCorzina",
+     url: "account/corzina",
+     defaults: new { controller = "Account", action = "Corzina" }
+ );
+
+
             routes.MapRoute(
                 name: "Account",
                 url: "account",
