@@ -20,12 +20,7 @@ namespace WebApplication5
             routes.IgnoreRoute("{*allaspx}", new { allaspx = @".*\.aspx(/.*)?" });
 
 
-         //  routes.MapPageRoute("HomepageRoute", "homepage", "~/Homepage.aspx");
-           // routes.MapPageRoute("SignInRoute", "signin", "~/SignIn.aspx");
-           // routes.MapPageRoute("SignUp", "signup", "~/SignUp.aspx");
-         
-
-            // Сначала определяем конкретные маршруты для MVC
+       
             routes.MapRoute(
                 name: "ProductsCard",
                 url: "products/card/{id}",
@@ -44,24 +39,20 @@ namespace WebApplication5
                 defaults: new { controller = "Account", action = "Index" }
             );
 
-      //   routes.MapRoute(
-        //        name: "Default",
-          //      url: "{controller}/{action}/{id}",
-            //    defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
-           // );
-       
-            // И только потом Web Forms маршруты
+ 
             routes.MapPageRoute("TestRoute", "test", "~/Test.aspx");
             routes.MapPageRoute("DefaultRoute", "", "~/Default.aspx");
             routes.MapPageRoute("RegisterRoute", "register", "~/Register.aspx");
 
 
 
-
-
+            routes.MapPageRoute("ONasRoute", "onas", "~/ONas.aspx");
+            routes.MapPageRoute("AboutRoute", "about", "~/About.aspx");
             routes.MapPageRoute("HomepageRoute", "homepage", "~/Homepage.aspx");
             routes.MapPageRoute("SignInRoute", "signin", "~/SignIn.aspx");
             routes.MapPageRoute("SignUp", "signup", "~/SignUp.aspx");
+            routes.MapPageRoute("Contacts", "contacts", "~/Contacts.aspx");
+            routes.MapPageRoute("NotFound", "notfound", "~/404.aspx");
         }
     }
 }

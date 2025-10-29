@@ -11,7 +11,7 @@ namespace WebApplication5
 {
 
 
-    public partial class Homepage
+    public partial class About
     {
 
         /// <summary>
@@ -31,24 +31,6 @@ namespace WebApplication5
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::WebApplication5.Controls.Header Header1;
-
-        /// <summary>
-        /// Hero1 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::WebApplication5.Controls.Hero Hero1;
-
-        /// <summary>
-        /// About1 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::WebApplication5.Controls.About About1;
 
         /// <summary>
         /// Footer1 control.

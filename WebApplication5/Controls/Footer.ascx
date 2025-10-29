@@ -14,9 +14,9 @@
             
             <div>
                 <h4 style="margin-bottom: 1rem;">Контакты</h4>
-                <p style="opacity: 0.8; margin-bottom: 0.5rem;">📞 +7 (999) 123-45-67</p>
-                <p style="opacity: 0.8; margin-bottom: 0.5rem;">✉️ info@profishing.ru</p>
-                <p style="opacity: 0.8;">📍 Москва, ул. Рыбацкая, 15</p>
+                <p style="opacity: 0.8; margin-bottom: 0.5rem;"> +7 (999) 123-45-67</p>
+                <p style="opacity: 0.8; margin-bottom: 0.5rem;"> info@profishing.ru</p>
+                <p style="opacity: 0.8;"> Москва, ул. Рыбацкая, 15</p>
             </div>
             
             <div>

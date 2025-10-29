@@ -12,15 +12,15 @@
         <div class="card-info">
             <h1>@Model.Name</h1>
             <div class="card-category">@Model.Category</div>
-            <div class="card-price">@Model.Price.ToString("N0") ₽</div>
+            <div class="card-price">@Model.Price.ToString("N0") Руб</div>
             <div class="card-stock">
                 @if (Model.StockQuantity > 0)
                 {
-                    <span class="in-stock">✓ В наличии: @Model.StockQuantity шт.</span>
+                    <span class="in-stock">В наличии: @Model.StockQuantity шт.</span>
                 }
                 else
                 {
-                    <span class="out-of-stock">✗ Нет в наличии</span>
+                    <span class="out-of-stock"> Нет в наличии</span>
                 }
             </div>
             <div class="card-description">

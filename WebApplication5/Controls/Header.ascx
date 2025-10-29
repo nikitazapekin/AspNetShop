@@ -11,10 +11,10 @@
             
             <nav>
                 <ul style="display: flex; list-style: none; margin: 0; gap: 2rem;">
-                    <li><a href="#home" style="color: white; text-decoration: none; font-weight: 500;">Главная</a></li>
-                    <li><a href="#products" style="color: white; text-decoration: none; font-weight: 500;">Удочки</a></li>
-                    <li><a href="#about" style="color: white; text-decoration: none; font-weight: 500;">О нас</a></li>
-                    <li><a href="#contact" style="color: white; text-decoration: none; font-weight: 500;">Контакты</a></li>
+                    <li><a href="/homepage" style="color: white; text-decoration: none; font-weight: 500;">Главная</a></li>
+                    <li><a href="/about" style="color: white; text-decoration: none; font-weight: 500;">Удочки</a></li>
+                    <li><a href="/onas" style="color: white; text-decoration: none; font-weight: 500;">О нас</a></li>
+                    <li><a href="/contacts" style="color: white; text-decoration: none; font-weight: 500;">Контакты</a></li>
                 </ul>
             </nav>
             

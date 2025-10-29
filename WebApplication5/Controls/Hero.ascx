@@ -1,11 +1,11 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="Hero.ascx.cs" Inherits="WebApplication5.Controls.Hero" %>
 
-<section id="home" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 120px 0;">
+<section id="home" style=" color: white; padding: 120px 0;">
     <div class="container">
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;">
             <div>
-                <h2 style="font-size: 3rem; margin-bottom: 1rem;">Профессиональные удочки для настоящих рыбаков</h2>
-                <p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9;">
+                <h2 style="font-size: 3rem; margin-bottom: 1rem; color: black">Профессиональные удочки для настоящих рыбаков</h2>
+                <p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9; color: black">
                     Откройте для себя мир качественных рыболовных снастей. 
                     Наши удочки - это надежность, прочность и гарантия отличного улова.
                 </p>
