@@ -42,7 +42,7 @@
                         <div class="item-total">
                             <span class="total-price">@item.TotalPrice.ToString("N0") руб</span>
                         </div>
-                        <button class="remove-btn" onclick="removeFromCart(@item.ProductId)">×</button>
+                     
                     </div>
                 }
             </div>
@@ -105,37 +105,34 @@
     .then(data => {
         if (data.success) {
             updateCartUI(data);
-            // Обновляем конкретный элемент если нужно
+         
             if (data.updatedItem) {
                 updateCartItem(productId, data.updatedItem.totalPrice);
             }
         }
         return data;
     })
-    .then((data) => console.log("DAT", data))
+   
     .catch(error => console.error('Error:', error));
 }
 
 function updateCartUI(data) {
-    // Обновляем общую сумму корзины
+    
     const cartTotalElements = document.querySelectorAll('.summary-total .total-amount, .total-amount');
     cartTotalElements.forEach(element => {
         element.textContent = data.cartTotal.toLocaleString() + ' руб';
     });
-
-    // Обновляем количество товаров в сводке
+ 
     const itemCountElement = document.querySelector('.summary-row span:first-child');
     if (itemCountElement) {
         itemCountElement.textContent = `Товары (${data.itemCount} шт.):`;
     }
-
-    // Обновляем сумму за товары
+     
     const itemsTotalElement = document.querySelector('.summary-row span:last-child');
     if (itemsTotalElement && data.cartTotal !== undefined) {
         itemsTotalElement.textContent = data.cartTotal.toLocaleString() + ' руб';
     }
-
-    // Если корзина пуста, показываем сообщение
+     
     if (data.itemCount === 0) {
         location.reload();
     }
