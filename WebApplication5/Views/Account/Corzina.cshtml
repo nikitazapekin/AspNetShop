@@ -13,7 +13,7 @@
     @if (Model == null || !Model.Any())
     {
         <div class="empty-cart">
-      
+
             <h2>Корзина пуста</h2>
             <p>Добавьте товары из каталога</p>
             <a href="@Url.Action("Index", "Products")" class="btn-primary">Перейти к покупкам</a>
@@ -69,6 +69,93 @@
         </div>
     }
 </div>
+
+
+<script>
+    function updateQuantity(productId, change) {
+        const input = document.querySelector(`.cart-item[data-product-id="${productId}"] .quantity-input`);
+        let newQuantity = parseInt(input.value) + change;
+
+        if (newQuantity < 1) newQuantity = 1;
+
+        input.value = newQuantity;
+        updateCartOnServer(productId, newQuantity);
+    }
+
+    function updateQuantityInput(productId, value) {
+        let quantity = parseInt(value);
+        if (isNaN(quantity) || quantity < 1) {
+            quantity = 1;
+        }
+
+        const input = document.querySelector(`.cart-item[data-product-id="${productId}"] .quantity-input`);
+        input.value = quantity;
+        updateCartOnServer(productId, quantity);
+    }
+    function updateCartOnServer(productId, quantity) {
+    fetch('https://localhost:44394/account/updatecart', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ productId: productId, quantity: quantity })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            updateCartUI(data);
+            // Обновляем конкретный элемент если нужно
+            if (data.updatedItem) {
+                updateCartItem(productId, data.updatedItem.totalPrice);
+            }
+        }
+        return data;
+    })
+    .then((data) => console.log("DAT", data))
+    .catch(error => console.error('Error:', error));
+}
+
+function updateCartUI(data) {
+    // Обновляем общую сумму корзины
+    const cartTotalElements = document.querySelectorAll('.summary-total .total-amount, .total-amount');
+    cartTotalElements.forEach(element => {
+        element.textContent = data.cartTotal.toLocaleString() + ' руб';
+    });
+
+    // Обновляем количество товаров в сводке
+    const itemCountElement = document.querySelector('.summary-row span:first-child');
+    if (itemCountElement) {
+        itemCountElement.textContent = `Товары (${data.itemCount} шт.):`;
+    }
+
+    // Обновляем сумму за товары
+    const itemsTotalElement = document.querySelector('.summary-row span:last-child');
+    if (itemsTotalElement && data.cartTotal !== undefined) {
+        itemsTotalElement.textContent = data.cartTotal.toLocaleString() + ' руб';
+    }
+
+    // Если корзина пуста, показываем сообщение
+    if (data.itemCount === 0) {
+        location.reload();
+    }
+}
+
+function updateCartItem(productId, totalPrice) {
+    const cartItems = document.querySelectorAll('.cart-item');
+    cartItems.forEach(item => {
+        if (item.getAttribute('data-product-id') == productId) {
+            const itemTotalElement = item.querySelector('.total-price');
+            if (itemTotalElement) {
+                itemTotalElement.textContent = totalPrice.toLocaleString() + ' руб';
+            }
+        }
+    });
+}
+</script>
+
+
+
 
 <style>
     .cart-container {
@@ -313,105 +400,5 @@
             color: white;
             text-decoration: none;
         }
-
-    @@media (max-width: 768px) {
-        .cart-content {
-            grid-template-columns: 1fr;
-        }
-
-        .cart-item {
-            grid-template-columns: 80px 1fr;
-            grid-template-areas:
-                "image details"
-                "quantity total"
-                "remove remove";
-            gap: 10px;
-        }
-
-        .item-image {
-            grid-area: image;
-        }
-
-        .item-details {
-            grid-area: details;
-        }
-
-        .item-quantity {
-            grid-area: quantity;
-        }
-
-        .item-total {
-            grid-area: total;
-            text-align: right;
-        }
-
-        .remove-btn {
-            grid-area: remove;
-            justify-self: end;
-        }
-
-        .cart-summary {
-            position: static;
-        }
-    }
-</style>
-
-<script>
-    function updateQuantity(productId, change) {
-        const input = document.querySelector(`.cart-item[data-product-id="${productId}"] .quantity-input`);
-        let newQuantity = parseInt(input.value) + change;
-
-        if (newQuantity < 1) newQuantity = 1;
-
-        input.value = newQuantity;
-        updateCartOnServer(productId, newQuantity);
-    }
-
-    function updateQuantityInput(productId, value) {
-        let quantity = parseInt(value);
-        if (isNaN(quantity) || quantity < 1) {
-            quantity = 1;
-        }
-
-        const input = document.querySelector(`.cart-item[data-product-id="${productId}"] .quantity-input`);
-        input.value = quantity;
-        updateCartOnServer(productId, quantity);
-    }
-
-    function updateCartOnServer(productId, quantity) {
      
-        fetch('@Url.Action("UpdateCart", "Account")', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ productId: productId, quantity: quantity })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload(); 
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }
-
-    function removeFromCart(productId) {
-        if (confirm('Вы уверены, что хотите удалить товар из корзины?')) {
-            fetch('@Url.Action("RemoveFromCart", "Account")', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ productId: productId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        }
-    }
-</script>
+</style>

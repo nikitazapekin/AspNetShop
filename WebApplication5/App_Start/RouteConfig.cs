@@ -20,7 +20,15 @@ namespace WebApplication5
             routes.IgnoreRoute("{*allaspx}", new { allaspx = @".*\.aspx(/.*)?" });
 
 
-       
+
+
+            routes.MapRoute(
+           name: "UpdateCart",
+           url: "account/updatecart",
+           defaults: new { controller = "Account", action = "UpdateCart" }
+       );
+
+
             routes.MapRoute(
                 name: "ProductsCard",
                 url: "products/card/{id}",
