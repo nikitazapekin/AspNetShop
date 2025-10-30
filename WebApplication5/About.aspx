@@ -65,12 +65,11 @@
         
         .section-title {
             text-align: center;
-            font-size: 2.5rem;
+            font-size: 28px;
             margin-bottom: 50px;
             color: #2c3e50;
         }
 
-        
         .rods-section {
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             padding: 80px 0;
@@ -106,17 +105,16 @@
             left: 0;
             right: 0;
             height: 4px;
-         
         }
 
         .rod-icon {
-            font-size: 3rem;
+            font-size: 36px;
             color: #007bff;
             margin-bottom: 20px;
         }
 
         .rod-title {
-            font-size: 1.5rem;
+            font-size: 18px;
             color: #2c3e50;
             margin-bottom: 15px;
             font-weight: bold;
@@ -144,7 +142,7 @@
         }
 
         .rod-price {
-            font-size: 1.8rem;
+            font-size: 20px;
             color: #007bff;
             font-weight: bold;
             margin: 20px 0;
@@ -158,7 +156,7 @@
             color: white;
             padding: 5px 40px;
             transform: rotate(45deg);
-            font-size: 0.8rem;
+            font-size: 12px;
             font-weight: bold;
         }
 
@@ -169,11 +167,15 @@
 
         .rods-description {
             text-align: center;
-            font-size: 1.2rem;
+            font-size: 16px;
             color: #666;
             max-width: 800px;
             margin: 0 auto 30px;
             line-height: 1.8;
+        }
+
+        .btn-margin-right {
+            margin-right: 15px;
         }
     </style>
 </head>
@@ -190,9 +192,7 @@
                 </p>
                 
                 <div class="rods-grid">
-                 
                     <div class="rod-card">
-                     
                         <h3 class="rod-title">Спиннинг Pro Cast</h3>
                         <ul class="rod-features">
                             <li>Длина: 2.4 метра</li>
@@ -219,7 +219,6 @@
                     </div> 
 
                     <div class="rod-card">
-                       
                         <h3 class="rod-title">Маховая удочка</h3>
                         <ul class="rod-features">
                             <li>Длина: 5 метров</li>
@@ -234,7 +233,7 @@
                 </div>
 
                 <div class="rods-cta">
-                    <button class="btn btn-outline" style="margin-right: 15px;">Смотреть все удочки</button>
+                    <button class="btn btn-outline btn-margin-right">Смотреть все удочки</button>
                     <button class="btn">Получить консультацию</button>
                 </div>
             </div>

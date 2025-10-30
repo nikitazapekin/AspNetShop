@@ -12,7 +12,7 @@
         <div class="card-info">
             <h1>@Model.Name</h1>
             <div class="card-category">@Model.Category</div>
-            <div class="card-price">@Model.Price.ToString("N0") Руб</div>
+            <div class="card-price">@Model.Price.ToString() Руб</div>
             <div class="card-stock">
                 @if (Model.StockQuantity > 0)
                 {
@@ -145,21 +145,5 @@
         .btn-back:hover {
             background: #545b62;
         }
-
-    /* Адаптивность */
-    @@media (max-width: 768px) {
-        .card-detail-content {
-            grid-template-columns: 1fr;
-            gap: 20px;
-            padding: 20px;
-        }
-
-        .card-image img {
-            height: 300px;
-        }
-
-        .card-actions {
-            flex-direction: column;
-        }
-    }
+ 
 </style>

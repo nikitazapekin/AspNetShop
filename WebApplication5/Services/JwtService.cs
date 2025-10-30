@@ -1,5 +1,4 @@
-﻿// Services/SimpleJwtService.cs
-using System;
+﻿using System;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web.Script.Serialization;
@@ -7,18 +6,18 @@ using WebApplication5.Models;
 
 namespace WebApplication5.Services
 {
-    public class SimpleJwtService
+    public class JwtService
     {
         private readonly string _secretKey;
 
-        public SimpleJwtService()
+        public JwtService()
         {
-            _secretKey = "your_super_secret_key_here_that_is_at_least_32_chars_long_123!";
+            _secretKey = "secret";
         }
 
         public string GenerateAccessToken(UserProfile user)
         {
-            var token = new SimpleToken
+            var token = new Token
             {
                 UserId = user.Id,
                 Email = user.Email,
@@ -31,19 +30,23 @@ namespace WebApplication5.Services
             return token.ToTokenString();
         }
 
-        public string GenerateRefreshToken()
+        public string GenerateRefreshToken(UserProfile user)
         {
-            var randomNumber = new byte[32];
-            using (var rng = RandomNumberGenerator.Create())
+            var refreshToken = new Token
             {
-                rng.GetBytes(randomNumber);
-                return Convert.ToBase64String(randomNumber);
-            }
+                UserId = user.Id,
+                Email = user.Email,
+                Expires = DateTimeToUnixTimestamp(DateTime.UtcNow.AddHours(1)), 
+                IssuedAt = DateTimeToUnixTimestamp(DateTime.UtcNow),
+                IsRefreshToken = true  
+            };
+
+            return refreshToken.ToTokenString();
         }
 
-        public SimpleToken ValidateToken(string tokenString)
+        public Token ValidateToken(string tokenString)
         {
-            var token = SimpleToken.FromTokenString(tokenString);
+            var token = Token.FromTokenString(tokenString);
             return token?.IsValid() == true ? token : null;
         }
 
@@ -51,12 +54,6 @@ namespace WebApplication5.Services
         {
             var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             return (long)(dateTime - epoch).TotalSeconds;
-        }
-
-        private DateTime UnixTimestampToDateTime(long unixTimestamp)
-        {
-            var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            return epoch.AddSeconds(unixTimestamp);
         }
     }
 }

@@ -65,7 +65,7 @@
         
         .section-title {
             text-align: center;
-            font-size: 2.5rem;
+            font-size: 28px;
             margin-bottom: 50px;
             color: #2c3e50;
         }
@@ -74,10 +74,7 @@
 <body>
     <form id="form1" runat="server">
         <uc:Header ID="Header1" runat="server" />
-
-
         <uc:Hero ID="Hero1" runat="server" />
-     
         <uc:About ID="About1" runat="server" />
         <uc:Footer ID="Footer1" runat="server" />
     </form>

@@ -73,7 +73,7 @@
         }
 
         .error-code {
-            font-size: 8rem;
+            font-size: 80px;
             font-weight: bold;
             color: #007bff;
             margin-bottom: 20px;
@@ -82,14 +82,14 @@
         }
 
         .error-title {
-            font-size: 2.5rem;
+            font-size: 28px;
             color: #2c3e50;
             margin-bottom: 20px;
             line-height: 1.2;
         }
 
         .error-subtitle {
-            font-size: 1.2rem;
+            font-size: 18px;
             color: #007bff;
             font-weight: 600;
             margin-bottom: 15px;
@@ -97,7 +97,7 @@
         }
 
         .error-description {
-            font-size: 1.1rem;
+            font-size: 16px;
             color: #666;
             margin-bottom: 40px;
             line-height: 1.8;
@@ -154,19 +154,19 @@
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 1.5rem;
+            font-size: 20px;
             margin: 0 auto 20px;
         }
 
         .feature-title {
-            font-size: 1.3rem;
+            font-size: 18px;
             color: #2c3e50;
             margin-bottom: 15px;
         }
 
         .feature-description {
             color: #666;
-            font-size: 1rem;
+            font-size: 14px;
             line-height: 1.6;
         }
 
@@ -181,7 +181,7 @@
             padding: 15px 20px;
             border: 2px solid #e9ecef;
             border-radius: 50px;
-            font-size: 1rem;
+            font-size: 14px;
             transition: all 0.3s;
             padding-right: 120px;
         }
@@ -210,10 +210,11 @@
             background: #0056b3;
         }
 
-     
-     
-
-      
+        .fishing-rod {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: rotate(15deg);
         }
     </style>
 </head>
@@ -225,23 +226,13 @@
             <div class="container">
                 <div class="error-content">
                     <div class="error-image">
-                      
-                     
-                        <div class="fishing-rod" style="top: 50%; left: 50%; transform: rotate(15deg);"></div>
+                        <div class="fishing-rod"></div>
                     </div>
                     
                     <div class="error-code">404</div>
                     
                     <span class="error-subtitle">ОЙ! СТРАНИЦА НЕ НАЙДЕНА</span>
                     <h1 class="error-title">Кажется, эта страница уплыла</h1>
-                    
-                    
-                    
-                   
-                    
-                   
-                    
-                
                 </div>
             </div>
         </section>

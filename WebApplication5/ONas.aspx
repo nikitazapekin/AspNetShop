@@ -67,12 +67,11 @@
         
         .section-title {
             text-align: center;
-            font-size: 2.5rem;
+            font-size: 28px;
             margin-bottom: 50px;
             color: #2c3e50;
         }
 
-       
         .about-section {
             background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
             padding: 100px 0;
@@ -86,14 +85,14 @@
         }
 
         .about-text h2 {
-            font-size: 2.5rem;
+            font-size: 28px;
             color: #2c3e50;
             margin-bottom: 20px;
             line-height: 1.2;
         }
 
         .about-subtitle {
-            font-size: 1.2rem;
+            font-size: 18px;
             color: #007bff;
             font-weight: 600;
             margin-bottom: 15px;
@@ -101,7 +100,7 @@
         }
 
         .about-description {
-            font-size: 1.1rem;
+            font-size: 16px;
             color: #666;
             margin-bottom: 30px;
             line-height: 1.8;
@@ -129,19 +128,19 @@
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 1.2rem;
+            font-size: 18px;
             flex-shrink: 0;
         }
 
         .feature-text h4 {
-            font-size: 1.1rem;
+            font-size: 16px;
             color: #2c3e50;
             margin-bottom: 5px;
         }
 
         .feature-text p {
             color: #666;
-            font-size: 0.95rem;
+            font-size: 14px;
         }
 
         .about-image {
@@ -175,7 +174,7 @@
         }
 
         .stat-number {
-            font-size: 2.5rem;
+            font-size: 28px;
             font-weight: bold;
             color: #007bff;
             margin-bottom: 10px;
@@ -183,21 +182,23 @@
 
         .stat-label {
             color: #666;
-            font-size: 1rem;
+            font-size: 14px;
         }
 
         .about-cta {
             text-align: center;
             margin-top: 50px;
         }
- 
+
+        .btn-margin-right {
+            margin-right: 15px;
+        }
     </style>
 </head>
 <body>
     <form id="form1" runat="server">
         <uc:Header ID="Header1" runat="server" />
         
-    
         <section class="about-section">
             <div class="container">
                 <div class="about-content">
@@ -210,10 +211,8 @@
                             для каждого.
                         </p>
                         
-                      
-                 
                         <div class="about-cta">
-                            <button class="btn" style="margin-right: 15px;">Написать нам</button>
+                            <button class="btn btn-margin-right">Написать нам</button>
                             <button class="btn btn-outline">Посмотреть ассортимент</button>
                         </div>
                     </div>
@@ -223,7 +222,6 @@
                     </div>
                 </div>
                 
-               
                 <div class="stats-container">
                     <div class="stat-item">
                         <div class="stat-number">10+</div>

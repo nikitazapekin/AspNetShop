@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -26,11 +25,11 @@ namespace WebApplication5.Controllers
         };
 
         private static List<RefreshToken> _refreshTokens = new List<RefreshToken>();
-        private readonly SimpleJwtService _jwtService;
+        private readonly JwtService _jwtService;
 
         public AuthController()
         {
-            _jwtService = new SimpleJwtService();
+            _jwtService = new JwtService();
         }
 
         [HttpPost]
@@ -58,12 +57,12 @@ namespace WebApplication5.Controllers
 
                 return Json(new { success = true, message = "Регистрация успешна" });
             }
-            catch (Exception ex)
+            catch
             {
                 return Json(new { success = false, message = "Ошибка при регистрации" });
             }
         }
- 
+
         [HttpPost]
         public ActionResult Login(LoginRequest request)
         {
@@ -79,24 +78,23 @@ namespace WebApplication5.Controllers
                 }
 
                 var accessToken = _jwtService.GenerateAccessToken(user);
-                var refreshToken = _jwtService.GenerateRefreshToken();
+                var refreshToken = _jwtService.GenerateRefreshToken(user);  
 
-             
                 _refreshTokens.RemoveAll(rt => rt.UserId == user.Id);
                 _refreshTokens.Add(new RefreshToken
                 {
                     Id = _refreshTokens.Count + 1,
                     UserId = user.Id,
                     Token = refreshToken,
-                    Expires = DateTime.UtcNow.AddDays(7),
+                    Expires = DateTime.UtcNow.AddHours(1),  
                     Created = DateTime.UtcNow
                 });
- 
+
                 Response.Cookies.Add(new HttpCookie("refreshToken", refreshToken)
                 {
                     HttpOnly = true,
-                    Secure = false, 
-                    Expires = DateTime.UtcNow.AddDays(7)
+                    Secure = false,
+                    Expires = DateTime.UtcNow.AddHours(1) 
                 });
 
                 return Json(new
@@ -111,7 +109,7 @@ namespace WebApplication5.Controllers
                 return Json(new { success = false, message = "Ошибка при входе" });
             }
         }
-         
+
         [HttpPost]
         public ActionResult Logout()
         {
@@ -122,7 +120,7 @@ namespace WebApplication5.Controllers
                 {
                     _refreshTokens.RemoveAll(rt => rt.Token == refreshToken);
                 }
-                 
+
                 if (Request.Cookies["refreshToken"] != null)
                 {
                     var cookie = new HttpCookie("refreshToken")
@@ -135,12 +133,12 @@ namespace WebApplication5.Controllers
 
                 return Json(new { success = true, redirectUrl = "/signin" });
             }
-            catch (Exception ex)
+            catch
             {
                 return Json(new { success = false, message = "Ошибка при выходе" });
             }
         }
-         
+
         [HttpGet]
         public ActionResult Validate()
         {
@@ -153,13 +151,13 @@ namespace WebApplication5.Controllers
                 {
                     return Json(new ValidateResponse { Authenticated = false }, JsonRequestBehavior.AllowGet);
                 }
-                 
+
                 var storedToken = _refreshTokens.FirstOrDefault(rt => rt.Token == refreshToken);
                 if (storedToken == null || storedToken.Expires <= DateTime.UtcNow)
                 {
                     return Json(new ValidateResponse { Authenticated = false }, JsonRequestBehavior.AllowGet);
                 }
- 
+
                 var token = _jwtService.ValidateToken(accessToken);
                 if (token == null)
                 {
@@ -188,6 +186,69 @@ namespace WebApplication5.Controllers
             catch
             {
                 return Json(new ValidateResponse { Authenticated = false }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public ActionResult Refresh()
+        {
+            try
+            {
+                var refreshToken = Request.Cookies["refreshToken"]?.Value;
+
+                if (string.IsNullOrEmpty(refreshToken))
+                {
+                    return Json(new { success = false, message = "Refresh token не найден" });
+                }
+ 
+                var validatedToken = _jwtService.ValidateToken(refreshToken);
+                if (validatedToken == null || !validatedToken.IsRefreshToken)
+                {
+                    return Json(new { success = false, message = "Невалидный refresh token" });
+                }
+
+             
+                var storedToken = _refreshTokens.FirstOrDefault(rt => rt.Token == refreshToken);
+                if (storedToken == null || storedToken.Expires <= DateTime.UtcNow)
+                {
+                    return Json(new { success = false, message = "Refresh token истек или не найден" });
+                }
+
+                var user = _users.FirstOrDefault(u => u.Id == validatedToken.UserId);
+                if (user == null)
+                {
+                    return Json(new { success = false, message = "Пользователь не найден" });
+                }
+ 
+                var newAccessToken = _jwtService.GenerateAccessToken(user);
+                var newRefreshToken = _jwtService.GenerateRefreshToken(user);
+ 
+                _refreshTokens.RemoveAll(rt => rt.Token == refreshToken);
+                _refreshTokens.Add(new RefreshToken
+                {
+                    Id = _refreshTokens.Count + 1,
+                    UserId = user.Id,
+                    Token = newRefreshToken,
+                    Expires = DateTime.UtcNow.AddHours(1),
+                    Created = DateTime.UtcNow
+                });
+ 
+                Response.Cookies.Add(new HttpCookie("refreshToken", newRefreshToken)
+                {
+                    HttpOnly = true,
+                    Secure = false,
+                    Expires = DateTime.UtcNow.AddHours(1)
+                });
+
+                return Json(new
+                {
+                    success = true,
+                    accessToken = newAccessToken
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Ошибка при обновлении токенов" });
             }
         }
     }

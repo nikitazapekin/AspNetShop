@@ -67,7 +67,7 @@
         
         .section-title {
             text-align: center;
-            font-size: 2.5rem;
+            font-size: 28px;
             margin-bottom: 50px;
             color: #2c3e50;
         }
@@ -78,19 +78,19 @@
         }
 
         .contacts-content {
-          display: flex; 
-          justify-content: center
+            display: flex; 
+            justify-content: center;
         }
 
         .contacts-info h2 {
-            font-size: 2.5rem;
+            font-size: 28px;
             color: #2c3e50;
             margin-bottom: 20px;
             line-height: 1.2;
         }
 
         .contacts-subtitle {
-            font-size: 1.2rem;
+            font-size: 18px;
             color: #007bff;
             font-weight: 600;
             margin-bottom: 15px;
@@ -98,7 +98,7 @@
         }
 
         .contacts-description {
-            font-size: 1.1rem;
+            font-size: 16px;
             color: #666;
             margin-bottom: 30px;
             line-height: 1.8;
@@ -124,19 +124,19 @@
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 1.2rem;
+            font-size: 18px;
             flex-shrink: 0;
         }
 
         .contact-text h4 {
-            font-size: 1.1rem;
+            font-size: 16px;
             color: #2c3e50;
             margin-bottom: 5px;
         }
 
         .contact-text p {
             color: #666;
-            font-size: 1rem;
+            font-size: 14px;
         }
 
         .contact-form {
@@ -145,9 +145,7 @@
             border-radius: 15px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             max-width: 600px; 
-            width: 100%
-
-          
+            width: 100%;
         }
 
         .form-group {
@@ -166,7 +164,7 @@
             padding: 12px 15px;
             border: 2px solid #e9ecef;
             border-radius: 8px;
-            font-size: 1rem;
+            font-size: 14px;
             transition: all 0.3s;
         }
 
@@ -200,7 +198,7 @@
             align-items: center;
             justify-content: center;
             color: #666;
-            font-size: 1.1rem;
+            font-size: 16px;
         }
 
         .social-links {
@@ -227,14 +225,24 @@
             transform: translateY(-3px);
         }
 
+        .form-title {
+            margin-bottom: 30px;
+            color: #2c3e50;
+            font-size: 24px;
+        }
+
         @media (max-width: 768px) {
             .contacts-content {
-                grid-template-columns: 1fr;
-                gap: 40px;
+                flex-direction: column;
+                align-items: center;
             }
             
             .contacts-section {
                 padding: 60px 0;
+            }
+            
+            .contact-form {
+                padding: 20px;
             }
         }
     </style>
@@ -245,22 +253,9 @@
         
         <section class="contacts-section">
             <div class="container">
-
-
-
-
-
                 <div class="contacts-content">
-                   
-
-
-
-
-
-
-
                     <div class="contact-form">
-                        <h3 style="margin-bottom: 30px; color: #2c3e50;">Форма обратной связи</h3>
+                        <h3 class="form-title">Форма обратной связи</h3>
                         
                         <div class="form-group">
                             <label class="form-label" for="txtName">Ваше имя *</label>
@@ -303,8 +298,6 @@
                         </div>
                     </div>
                 </div>
-                
-               
             </div>
         </section>
        

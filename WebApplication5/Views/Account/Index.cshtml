@@ -14,7 +14,7 @@
         <div class="profile-card">
             <div class="profile-header">
                 <h2>Профиль пользователя</h2>
-                <a href="@Url.Action("Edit")" class="btn-edit">Редактировать</a>
+              
             </div>
 
             <div class="profile-info">
@@ -64,10 +64,9 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Проверка аутентификации при загрузке страницы
+       
         checkAuthentication();
-
-        // Обработчик выхода
+ 
         document.getElementById('logoutBtn').addEventListener('click', function () {
             logout();
         });
@@ -94,7 +93,7 @@
                     localStorage.removeItem('accessToken');
                     window.location.href = '/signin';
                 }
-                // Если authenticated: true, остаемся на странице
+              
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -128,7 +127,7 @@
     }
 
     function showMessage(message, type) {
-        // Создаем элемент для сообщения, если его нет
+        
         let messageDiv = document.getElementById('message');
         if (!messageDiv) {
             messageDiv = document.createElement('div');
