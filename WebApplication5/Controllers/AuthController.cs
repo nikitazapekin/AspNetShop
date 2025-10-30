@@ -1,4 +1,4 @@
-﻿// Controllers/AuthController.cs
+﻿
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +33,6 @@ namespace WebApplication5.Controllers
             _jwtService = new SimpleJwtService();
         }
 
-        // POST: /auth/register
         [HttpPost]
         public ActionResult Register(RegisterRequest request)
         {
@@ -64,8 +63,7 @@ namespace WebApplication5.Controllers
                 return Json(new { success = false, message = "Ошибка при регистрации" });
             }
         }
-
-        // POST: /auth/login
+ 
         [HttpPost]
         public ActionResult Login(LoginRequest request)
         {
@@ -83,7 +81,7 @@ namespace WebApplication5.Controllers
                 var accessToken = _jwtService.GenerateAccessToken(user);
                 var refreshToken = _jwtService.GenerateRefreshToken();
 
-                // Сохраняем refresh token
+             
                 _refreshTokens.RemoveAll(rt => rt.UserId == user.Id);
                 _refreshTokens.Add(new RefreshToken
                 {
@@ -93,12 +91,11 @@ namespace WebApplication5.Controllers
                     Expires = DateTime.UtcNow.AddDays(7),
                     Created = DateTime.UtcNow
                 });
-
-                // Устанавливаем refresh token в httpOnly cookie
+ 
                 Response.Cookies.Add(new HttpCookie("refreshToken", refreshToken)
                 {
                     HttpOnly = true,
-                    Secure = false, // установите true в production с HTTPS
+                    Secure = false, 
                     Expires = DateTime.UtcNow.AddDays(7)
                 });
 
@@ -114,8 +111,7 @@ namespace WebApplication5.Controllers
                 return Json(new { success = false, message = "Ошибка при входе" });
             }
         }
-
-        // POST: /auth/logout
+         
         [HttpPost]
         public ActionResult Logout()
         {
@@ -126,8 +122,7 @@ namespace WebApplication5.Controllers
                 {
                     _refreshTokens.RemoveAll(rt => rt.Token == refreshToken);
                 }
-
-                // Удаляем cookie
+                 
                 if (Request.Cookies["refreshToken"] != null)
                 {
                     var cookie = new HttpCookie("refreshToken")
@@ -145,8 +140,7 @@ namespace WebApplication5.Controllers
                 return Json(new { success = false, message = "Ошибка при выходе" });
             }
         }
-
-        // GET: /auth/validate
+         
         [HttpGet]
         public ActionResult Validate()
         {
@@ -159,15 +153,13 @@ namespace WebApplication5.Controllers
                 {
                     return Json(new ValidateResponse { Authenticated = false }, JsonRequestBehavior.AllowGet);
                 }
-
-                // Проверяем refresh token
+                 
                 var storedToken = _refreshTokens.FirstOrDefault(rt => rt.Token == refreshToken);
                 if (storedToken == null || storedToken.Expires <= DateTime.UtcNow)
                 {
                     return Json(new ValidateResponse { Authenticated = false }, JsonRequestBehavior.AllowGet);
                 }
-
-                // Проверяем access token
+ 
                 var token = _jwtService.ValidateToken(accessToken);
                 if (token == null)
                 {
