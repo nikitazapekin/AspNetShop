@@ -1,4 +1,4 @@
-﻿ 
+﻿
 using System;
 using System.Collections.Generic;
 using System.Web;
@@ -18,6 +18,32 @@ namespace WebApplication5
             routes.IgnoreRoute("Products.aspx");
             routes.IgnoreRoute("Register.aspx");
             routes.IgnoreRoute("{*allaspx}", new { allaspx = @".*\.aspx(/.*)?" });
+
+
+
+            routes.MapRoute(
+               name: "AuthRegister",
+               url: "auth/register",
+               defaults: new { controller = "Auth", action = "Register" }
+           );
+
+            routes.MapRoute(
+                name: "AuthLogin",
+                url: "auth/login",
+                defaults: new { controller = "Auth", action = "Login" }
+            );
+
+            routes.MapRoute(
+                name: "AuthLogout",
+                url: "auth/logout",
+                defaults: new { controller = "Auth", action = "Logout" }
+            );
+
+            routes.MapRoute(
+                name: "AuthValidate",
+                url: "auth/validate",
+                defaults: new { controller = "Auth", action = "Validate" }
+            );
 
 
 
@@ -55,7 +81,7 @@ namespace WebApplication5
                 defaults: new { controller = "Account", action = "Index" }
             );
 
- 
+
             routes.MapPageRoute("TestRoute", "test", "~/Test.aspx");
             routes.MapPageRoute("DefaultRoute", "", "~/Default.aspx");
             routes.MapPageRoute("RegisterRoute", "register", "~/Register.aspx");
@@ -69,8 +95,7 @@ namespace WebApplication5
             routes.MapPageRoute("SignUp", "signup", "~/SignUp.aspx");
             routes.MapPageRoute("Contacts", "contacts", "~/Contacts.aspx");
             routes.MapPageRoute("NotFound", "notfound", "~/404.aspx");
+
         }
     }
 }
-
- 

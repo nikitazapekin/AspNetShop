@@ -3,42 +3,68 @@
 <div class="signin-form">
     <h2>Вход в систему</h2>
     
-    <asp:Label ID="lblMessage" runat="server" CssClass="message" Visible="false"></asp:Label>
+    <div id="message" class="message" style="display: none;"></div>
     
     <div class="form-group">
-        <asp:Label ID="lblLogin" runat="server" Text="Логин:" AssociatedControlID="txtLogin"></asp:Label>
+        <label for="txtLogin">Логин или Email:</label>
         <asp:TextBox ID="txtLogin" runat="server" CssClass="form-control" placeholder="Введите email или логин"></asp:TextBox>
-        <asp:RequiredFieldValidator ID="rfvLogin" runat="server" 
-            ControlToValidate="txtLogin" ErrorMessage="Введите логин или email" 
-            Display="Dynamic" CssClass="validator" ValidationGroup="SignIn"></asp:RequiredFieldValidator>
     </div>
 
     <div class="form-group">
-        <asp:Label ID="lblPassword" runat="server" Text="Пароль:" AssociatedControlID="txtPassword"></asp:Label>
+        <label for="txtPassword">Пароль:</label>
         <asp:TextBox ID="txtPassword" runat="server" CssClass="form-control" TextMode="Password"></asp:TextBox>
-        <asp:RequiredFieldValidator ID="rfvPassword" runat="server" 
-            ControlToValidate="txtPassword" ErrorMessage="Введите пароль" 
-            Display="Dynamic" CssClass="validator" ValidationGroup="SignIn"></asp:RequiredFieldValidator>
-    </div>
-
-    <div class="form-group">
-        <asp:CheckBox ID="chkRememberMe" runat="server" Text="Запомнить меня" />
     </div>
 
     <div class="form-actions">
-        <asp:Button ID="btnSignIn" runat="server" Text="Войти" 
-            CssClass="btn btn-primary" ValidationGroup="SignIn" OnClick="btnSignIn_Click" />
-        <asp:Button ID="btnReset" runat="server" Text="Очистить" 
-            CssClass="btn btn-secondary" CausesValidation="false" OnClick="btnReset_Click" />
+        <button type="button" id="btnSignIn" class="btn btn-primary">Войти</button>
     </div>
 
     <div class="signup-redirect" style="margin-top: 20px; text-align: center; padding: 15px; border-top: 1px solid #ddd;">
         <p style="margin: 0 0 10px 0;">Еще нет аккаунта?</p>
-        <asp:HyperLink ID="hlSignUp" runat="server" 
-            NavigateUrl="~/SignUp.aspx" 
-            CssClass="btn btn-outline-primary"
-            Text="Зарегистрироваться" />
+        <a href="/SignUp" class="btn btn-outline-primary">Зарегистрироваться</a>
     </div>
 </div>
 
- 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('btnSignIn').addEventListener('click', function() {
+        const loginData = {
+            Login: document.getElementById('<%= txtLogin.ClientID %>').value,
+            Password: document.getElementById('<%= txtPassword.ClientID %>').value
+        };
+
+        if (!loginData.Login || !loginData.Password) {
+            showMessage('Заполните все поля', 'error');
+            return;
+        }
+        
+        fetch('/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(loginData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                localStorage.setItem('accessToken', data.accessToken);
+                window.location.href = data.redirectUrl;
+            } else {
+                showMessage(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('Ошибка сети', 'error');
+        });
+    });
+
+    function showMessage(message, type) {
+        const messageDiv = document.getElementById('message');
+        messageDiv.textContent = message;
+        messageDiv.className = `message ${type}`;
+        messageDiv.style.display = 'block';
+    }
+});
+</script>

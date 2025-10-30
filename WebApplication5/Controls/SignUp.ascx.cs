@@ -28,15 +28,7 @@ namespace WebApplication5.Controls
             }
         }
 
-        protected void btnReset_Click(object sender, EventArgs e)
-        {
-            ClearForm();
-        }
-
-        protected void cvAgreement_ServerValidate(object source, ServerValidateEventArgs args)
-        {
-            args.IsValid = chkAgreement.Checked;
-        }
+      
 
         private void ClearForm()
         {
@@ -46,16 +38,12 @@ namespace WebApplication5.Controls
    
             txtPassword.Text = "";
             txtConfirmPassword.Text = "";
-            chkAgreement.Checked = false;
- 
-            lblMessage.Visible = false;
+         
         }
 
         private void ShowMessage(string message, string type)
         {
-            lblMessage.Text = message;
-            lblMessage.CssClass = $"message message-{type}";
-            lblMessage.Visible = true;
+           
         }
  
         public string FirstName => txtFirstName.Text.Trim();

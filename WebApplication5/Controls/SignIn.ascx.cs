@@ -57,21 +57,18 @@ namespace WebApplication5.Controls
         {
             txtLogin.Text = "";
             txtPassword.Text = "";
-            chkRememberMe.Checked = false;
-            lblMessage.Visible = false;
+           
         }
 
         private void ShowMessage(string message, string type)
         {
-            lblMessage.Text = message;
-            lblMessage.CssClass = $"message message-{type}";
-            lblMessage.Visible = true;
+           
         }
 
       
         public string Login => txtLogin.Text.Trim();
         public string Password => txtPassword.Text;
-        public bool RememberMe => chkRememberMe.Checked;
+     
 
         public void ResetForm()
         {

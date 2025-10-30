@@ -89,10 +89,7 @@
             font-size: 16px;
         }
 
-            .nav-link:hover {
-                color: #007bff;
-                background: rgba(255,255,255,0.1);
-            }
+            
 
         .header-actions {
             display: flex;
@@ -141,7 +138,7 @@
             padding: 20px 0;
         }
 
-        /* Стили для футера как в Footer.ascx */
+     
         .footer-main {
             background: #2c3e50;
             color: white;
@@ -214,40 +211,17 @@
             margin: 0;
         }
 
-        /* Адаптивность для мобильных */
-        @@media (max-width: 768px) {
-            .header-inner {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .nav-list {
-                gap: 15px;
-            }
-
-            .header-actions {
-                gap: 10px;
-            }
-
-            .main-content {
-                margin-top: 120px;
-            }
-
-            .footer-grid {
-                gap: 30px;
-                margin-bottom: 30px;
-            }
-        }
+      
     </style>
 </head>
 <body>
     <div class="page-wrapper">
-        <!-- Фиксированный хедер -->
+     
         <header class="header-fixed">
             <div class="container-wide">
                 <div class="header-inner">
                     <div class="logo">
-                        <a href="@Url.Action("Index", "Home")" class="logo-link">
+                        <a href="" class="logo-link">
                             <h1 class="logo-text">
                                 <span class="logo-part-blue">Pro</span><span class="logo-part-white">Fishing</span>
                             </h1>
@@ -256,23 +230,29 @@
 
                     <nav class="nav-main">
                         <ul class="nav-list">
-                            <li>@Html.ActionLink("Главная", "Index", "Home", null, new { @class = "nav-link" })</li>
-                            <li>@Html.ActionLink("Удочки", "Index", "Products", null, new { @class = "nav-link" })</li>
-                            <li>@Html.ActionLink("О нас", "About", "Home", null, new { @class = "nav-link" })</li>
-                            <li>@Html.ActionLink("Контакты", "Contact", "Home", null, new { @class = "nav-link" })</li>
+                            <!--  <li><a href="/contacts">  </a></li> -->
+                            <!--   <li>Html.ActionLink("Главная", "Index", "Home", null, new { class = "nav-link" })</li>
+    <li>Html.ActionLink("Удочки", "Index", "Products", null, new { class = "nav-link" })</li>
+    <li>Html.ActionLink("О нас", "About", "Home", null, new { class = "nav-link" })</li>
+    <li>Html.ActionLink("Контакты", "Contact", "Home", null, new { class = "nav-link" })</li>
+      -->
+                            <li><a class="nav-link" href="/homepage"> Главная </a></li>
+                            <li><a  class="nav-link" href="/products"> Удочки </a></li>
+                            <li><a class="nav-link" href="/onas"> О нас </a></li>
+                            <li><a class="nav-link" href="/contacts">Контакты</a></li>
                         </ul>
                     </nav>
 
                     <div class="header-actions">
-                        <!-- Корзина -->
-                        <a href="@Url.Action("Index", "Cart")" class="action-button">
+                 
+                        <a href="" class="action-button">
                           
                             Корзина
                         
                         </a>
 
                      
-                        <a href="@Url.Action("Index", "Account")" class="action-button">
+                        <a href="" class="action-button">
                            
                             Аккаунт
                         </a>

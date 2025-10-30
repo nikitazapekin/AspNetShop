@@ -3,99 +3,121 @@
 <div class="signup-form">
     <h2>Регистрация</h2>
     
-    <asp:Label ID="lblMessage" runat="server" CssClass="message" Visible="false"></asp:Label>
+    <div id="message" class="message" style="display: none;"></div>
     
     <div class="form-group">
-        <asp:Label ID="lblFirstName" runat="server" Text="Имя:" AssociatedControlID="txtFirstName"></asp:Label>
+        <label for="txtFirstName">Имя:</label>
         <asp:TextBox ID="txtFirstName" runat="server" CssClass="form-control"></asp:TextBox>
-        <asp:RequiredFieldValidator ID="rfvFirstName" runat="server" 
-            ControlToValidate="txtFirstName" ErrorMessage="Введите имя" 
-            Display="Dynamic" CssClass="validator" ValidationGroup="SignUp"></asp:RequiredFieldValidator>
-        <asp:RegularExpressionValidator ID="revFirstName" runat="server"
-            ControlToValidate="txtFirstName" ErrorMessage="Имя должно содержать только буквы"
-            ValidationExpression="^[a-zA-Zа-яА-ЯёЁ\s]{2,50}$" Display="Dynamic" CssClass="validator"
-            ValidationGroup="SignUp"></asp:RegularExpressionValidator>
     </div>
 
     <div class="form-group">
-        <asp:Label ID="lblLastName" runat="server" Text="Фамилия:" AssociatedControlID="txtLastName"></asp:Label>
+        <label for="txtLastName">Фамилия:</label>
         <asp:TextBox ID="txtLastName" runat="server" CssClass="form-control"></asp:TextBox>
-        <asp:RequiredFieldValidator ID="rfvLastName" runat="server" 
-            ControlToValidate="txtLastName" ErrorMessage="Введите фамилию" 
-            Display="Dynamic" CssClass="validator" ValidationGroup="SignUp"></asp:RequiredFieldValidator>
-        <asp:RegularExpressionValidator ID="revLastName" runat="server"
-            ControlToValidate="txtLastName" ErrorMessage="Фамилия должна содержать только буквы"
-            ValidationExpression="^[a-zA-Zа-яА-ЯёЁ\s]{2,50}$" Display="Dynamic" CssClass="validator"
-            ValidationGroup="SignUp"></asp:RegularExpressionValidator>
     </div>
 
     <div class="form-group">
-        <asp:Label ID="lblEmail" runat="server" Text="Email:" AssociatedControlID="txtEmail"></asp:Label>
+        <label for="txtEmail">Email:</label>
         <asp:TextBox ID="txtEmail" runat="server" CssClass="form-control" TextMode="Email"></asp:TextBox>
-        <asp:RequiredFieldValidator ID="rfvEmail" runat="server" 
-            ControlToValidate="txtEmail" ErrorMessage="Введите email" 
-            Display="Dynamic" CssClass="validator" ValidationGroup="SignUp"></asp:RequiredFieldValidator>
-        <asp:RegularExpressionValidator ID="revEmail" runat="server"
-            ControlToValidate="txtEmail" ErrorMessage="Введите корректный email"
-            ValidationExpression="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" 
-            Display="Dynamic" CssClass="validator" ValidationGroup="SignUp"></asp:RegularExpressionValidator>
     </div>
 
     <div class="form-group">
-        <asp:Label ID="lblPhone" runat="server" Text="Телефон:" AssociatedControlID="txtPhone"></asp:Label>
-        <asp:TextBox ID="txtPhone" runat="server" CssClass="form-control" placeholder="+7 (XXX) XXX-XX-XX"></asp:TextBox>
-        <asp:RegularExpressionValidator ID="revPhone" runat="server"
-            ControlToValidate="txtPhone" ErrorMessage="Введите корректный номер телефона"
-            ValidationExpression="^(\+375|8)?[\s\-]?\(?[0-9]{3}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$"
-            Display="Dynamic" CssClass="validator" ValidationGroup="SignUp"></asp:RegularExpressionValidator>
+        <label for="txtPhone">Телефон:</label>
+        <asp:TextBox ID="txtPhone" runat="server" CssClass="form-control" placeholder="+375 (XX) XXX-XX-XX"></asp:TextBox>
     </div>
 
     <div class="form-group">
-        <asp:Label ID="lblPassword" runat="server" Text="Пароль:" AssociatedControlID="txtPassword"></asp:Label>
+        <label for="txtPassword">Пароль:</label>
         <asp:TextBox ID="txtPassword" runat="server" CssClass="form-control" TextMode="Password"></asp:TextBox>
-        <asp:RequiredFieldValidator ID="rfvPassword" runat="server" 
-            ControlToValidate="txtPassword" ErrorMessage="Введите пароль" 
-            Display="Dynamic" CssClass="validator" ValidationGroup="SignUp"></asp:RequiredFieldValidator>
-        <asp:RegularExpressionValidator ID="revPassword" runat="server"
-            ControlToValidate="txtPassword" ErrorMessage="Пароль должен содержать минимум 8 символов, включая цифры и буквы"
-            ValidationExpression="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$"
-            Display="Dynamic" CssClass="validator" ValidationGroup="SignUp"></asp:RegularExpressionValidator>
     </div>
 
     <div class="form-group">
-        <asp:Label ID="lblConfirmPassword" runat="server" Text="Подтвердите пароль:" AssociatedControlID="txtConfirmPassword"></asp:Label>
+        <label for="txtConfirmPassword">Подтвердите пароль:</label>
         <asp:TextBox ID="txtConfirmPassword" runat="server" CssClass="form-control" TextMode="Password"></asp:TextBox>
-        <asp:RequiredFieldValidator ID="rfvConfirmPassword" runat="server" 
-            ControlToValidate="txtConfirmPassword" ErrorMessage="Подтвердите пароль" 
-            Display="Dynamic" CssClass="validator" ValidationGroup="SignUp"></asp:RequiredFieldValidator>
-        <asp:CompareValidator ID="cvConfirmPassword" runat="server"
-            ControlToValidate="txtConfirmPassword" ControlToCompare="txtPassword"
-            ErrorMessage="Пароли не совпадают" Display="Dynamic" CssClass="validator"
-            ValidationGroup="SignUp"></asp:CompareValidator>
-    </div>
-
-    <div class="form-group">
-        <asp:CheckBox ID="chkAgreement" runat="server" Text="Я согласен с условиями пользовательского соглашения" />
-        <asp:CustomValidator ID="cvAgreement" runat="server"
-            ErrorMessage="Необходимо принять условия соглашения"
-            Display="Dynamic" CssClass="validator" ValidationGroup="SignUp"
-            OnServerValidate="cvAgreement_ServerValidate"></asp:CustomValidator>
     </div>
 
     <div class="form-actions">
-        <asp:Button ID="btnSignUp" runat="server" Text="Зарегистрироваться" 
-            CssClass="btn btn-primary" ValidationGroup="SignUp" OnClick="btnSignUp_Click" />
-        <asp:Button ID="btnReset" runat="server" Text="Очистить" 
-            CssClass="btn btn-secondary" CausesValidation="false" OnClick="btnReset_Click" />
+        <button type="button" id="btnSignUp" class="btn btn-primary">Зарегистрироваться</button>
     </div>
 
-      <div class="login-redirect" style="margin-top: 20px; text-align: center; padding: 15px; border-top: 1px solid #ddd;">
+    <div class="login-redirect" style="margin-top: 20px; text-align: center; padding: 15px; border-top: 1px solid #ddd;">
         <p style="margin: 0 0 10px 0;">Уже есть аккаунт?</p>
-        <asp:HyperLink ID="hlSignIn" runat="server" 
-            NavigateUrl="https://localhost:44394/signin" 
-            CssClass="btn btn-outline-primary"
-            Text="Войти в аккаунт" />
+        <a href="/SignIn" class="btn btn-outline-primary">Войти в аккаунт</a>
     </div>
-
-
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('btnSignUp').addEventListener('click', function() {
+        const userData = {
+            FirstName: document.getElementById('<%= txtFirstName.ClientID %>').value,
+            LastName: document.getElementById('<%= txtLastName.ClientID %>').value,
+            Email: document.getElementById('<%= txtEmail.ClientID %>').value,
+            Phone: document.getElementById('<%= txtPhone.ClientID %>').value,
+            Password: document.getElementById('<%= txtPassword.ClientID %>').value
+        };
+         
+        if (!userData.FirstName || !userData.LastName || !userData.Email || !userData.Password) {
+            showMessage('Заполните все обязательные поля', 'error');
+            return;
+        }
+
+        if (userData.Password !== document.getElementById('<%= txtConfirmPassword.ClientID %>').value) {
+            showMessage('Пароли не совпадают', 'error');
+            return;
+        }
+
+        fetch('/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(userData)
+        })
+        .then(response => response.json())
+            .then(data => {
+            console.log("resp", data)
+            if (data.success) {
+                showMessage('Регистрация успешна! Перенаправление...', 'success');
+                setTimeout(() => {
+                    window.location.href = '/SignIn';
+                }, 2000);
+            } else {
+                showMessage(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('Ошибка сети', 'error');
+        });
+    });
+
+    function showMessage(message, type) {
+        const messageDiv = document.getElementById('message');
+        messageDiv.textContent = message;
+        messageDiv.className = `message ${type}`;
+        messageDiv.style.display = 'block';
+        
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 5000);
+    }
+});
+</script>
+
+<style>
+.message {
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+}
+.message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+.message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+</style>

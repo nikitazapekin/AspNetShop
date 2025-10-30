@@ -8,7 +8,7 @@ namespace WebApplication5.Controllers
 {
     public class AccountController : Controller
     {
-      
+        // Временное хранилище корзины в сессии
         private List<CartItem> CartItems
         {
             get
@@ -21,7 +21,7 @@ namespace WebApplication5.Controllers
             }
             set { Session["Cart"] = value; }
         }
-         
+
         private UserProfile GetCurrentUser()
         {
             return new UserProfile
@@ -43,14 +43,13 @@ namespace WebApplication5.Controllers
                 new CartItem { ProductId = 3, ProductName = "Зимняя удочка Frost Line", Price = 1290, Quantity = 1, ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlYn61blgUFcPH9sE6OZDzZ60KGjHgmUFwrw&s" }
             };
         }
-        [OutputCache(Duration = 36000)]
+
         public ActionResult Index()
         {
             var user = GetCurrentUser();
             return View(user);
         }
 
-     [OutputCache(Duration = 3600)]
         public ActionResult Edit()
         {
             var user = GetCurrentUser();
@@ -81,10 +80,11 @@ namespace WebApplication5.Controllers
             if (cartItem != null)
             {
                 cartItem.Quantity = quantity;
-              
+                // Обновляем сессию
                 CartItems = CartItems;
             }
- 
+
+            // Возвращаем обновленные данные корзины
             var total = cartItem?.TotalPrice ?? 0;
             var cartTotal = CartItems.Sum(i => i.TotalPrice);
             var itemCount = CartItems.Sum(i => i.Quantity);
@@ -106,7 +106,7 @@ namespace WebApplication5.Controllers
             if (cartItem != null)
             {
                 CartItems.Remove(cartItem);
-              
+                // Обновляем сессию
                 CartItems = CartItems;
             }
 
@@ -122,4 +122,161 @@ namespace WebApplication5.Controllers
             });
         }
     }
-} 
+}
+ 
+/*
+
+// Controllers/AccountController.cs
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using WebApplication5.Models;
+using WebApplication5.Services;
+
+namespace WebApplication5.Controllers
+{
+    public class AccountController : Controller
+    {
+        private readonly SimpleJwtService _jwtService;
+
+        public AccountController()
+        {
+            _jwtService = new SimpleJwtService();
+        }
+
+        private UserProfile GetCurrentUser()
+        {
+            try
+            {
+                var accessToken = Request.Headers["Authorization"]?.Replace("Bearer ", "");
+                if (string.IsNullOrEmpty(accessToken))
+                    return null;
+
+                var token = _jwtService.ValidateToken(accessToken);
+             //   if (token == null)
+              //      return null;
+ 
+                return new UserProfile
+                {
+                    FirstName = token.FirstName,
+                    LastName = token.LastName,
+                    Email = token.Email,
+                    Phone = "+375 29 123-45-67"  
+                };
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public ActionResult Index()
+        {
+            var user = GetCurrentUser();
+            if (user == null)
+            {
+                return RedirectToAction("SignIn", "Home");
+            }
+            return View(user);
+        }
+ 
+        private List<CartItem> CartItems
+        {
+            get
+            {
+                if (Session["Cart"] == null)
+                {
+                    Session["Cart"] = GetCartItems();
+                }
+                return (List<CartItem>)Session["Cart"];
+            }
+            set { Session["Cart"] = value; }
+        }
+
+        private List<CartItem> GetCartItems()
+        {
+            return new List<CartItem>
+            {
+                new CartItem { ProductId = 1, ProductName = "Спиннинг Pro Cast", Price = 249.99m, Quantity = 1, ImageUrl = "https://via.placeholder.com/100" },
+                new CartItem { ProductId = 2, ProductName = "Морская удочка Ocean Master", Price = 599.99m, Quantity = 2, ImageUrl = "https://via.placeholder.com/100" },
+                new CartItem { ProductId = 3, ProductName = "Зимняя удочка Frost Line", Price = 129.99m, Quantity = 1, ImageUrl = "https://via.placeholder.com/100" }
+            };
+        }
+
+        public ActionResult Edit()
+        {
+            var user = GetCurrentUser();
+            if (user == null)
+            {
+                return RedirectToAction("SignIn", "Home");
+            }
+            return View(user);
+        }
+
+        [HttpPost]
+        public ActionResult Edit(UserProfile model)
+        {
+            if (ModelState.IsValid)
+            {
+                TempData["SuccessMessage"] = "Данные успешно обновлены!";
+                return RedirectToAction("Index");
+            }
+            return View(model);
+        }
+
+        public ActionResult Corzina()
+        {
+            var cartItems = CartItems;
+            return View(cartItems);
+        }
+
+        [HttpPost]
+        public ActionResult UpdateCart(int productId, int quantity)
+        {
+            var cartItem = CartItems.FirstOrDefault(item => item.ProductId == productId);
+            if (cartItem != null)
+            {
+                cartItem.Quantity = quantity;
+                CartItems = CartItems;
+            }
+
+            var total = cartItem?.TotalPrice ?? 0;
+            var cartTotal = CartItems.Sum(i => i.TotalPrice);
+            var itemCount = CartItems.Sum(i => i.Quantity);
+
+            return Json(new
+            {
+                success = true,
+                message = "Количество обновлено",
+                itemTotal = total,
+                cartTotal = cartTotal,
+                itemCount = itemCount
+            });
+        }
+
+        [HttpPost]
+        public ActionResult RemoveFromCart(int productId)
+        {
+            var cartItem = CartItems.FirstOrDefault(item => item.ProductId == productId);
+            if (cartItem != null)
+            {
+                CartItems.Remove(cartItem);
+                CartItems = CartItems;
+            }
+
+            var cartTotal = CartItems.Sum(i => i.TotalPrice);
+            var itemCount = CartItems.Sum(i => i.Quantity);
+
+            return Json(new
+            {
+                success = true,
+                message = "Товар удален из корзины",
+                cartTotal = cartTotal,
+                itemCount = itemCount
+            });
+        }
+    }
+}
+*/
