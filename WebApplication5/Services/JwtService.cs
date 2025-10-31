@@ -14,7 +14,6 @@ namespace WebApplication5.Services
         {
             
         }
-
         public string GenerateAccessToken(UserProfile user)
         {
             var token = new Token
