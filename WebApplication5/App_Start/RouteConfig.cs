@@ -76,14 +76,22 @@ namespace WebApplication5
 
 
             routes.MapRoute(
+name: "AccountEdit",
+url: "account/edit",
+defaults: new { controller = "Account", action = "Edit" }
+);
+
+
+
+            routes.MapRoute(
                 name: "Account",
                 url: "account",
                 defaults: new { controller = "Account", action = "Index" }
             );
 
-
+            routes.MapPageRoute("RootRoute", "", "~/Homepage.aspx");
             routes.MapPageRoute("TestRoute", "test", "~/Test.aspx");
-            routes.MapPageRoute("DefaultRoute", "", "~/Default.aspx");
+          //  routes.MapPageRoute("DefaultRoute", "", "~/Default.aspx");
             routes.MapPageRoute("RegisterRoute", "register", "~/Register.aspx");
 
 

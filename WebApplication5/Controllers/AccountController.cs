@@ -81,7 +81,7 @@ namespace WebApplication5.Controllers
             {
                 cartItem.Quantity = quantity;
                
-                CartItems = CartItems;
+              
             }
  
             var total = cartItem?.TotalPrice ?? 0;
@@ -106,7 +106,7 @@ namespace WebApplication5.Controllers
             {
                 CartItems.Remove(cartItem);
             
-                CartItems = CartItems;
+                
             }
 
             var cartTotal = CartItems.Sum(i => i.TotalPrice);

@@ -23,7 +23,7 @@ namespace WebApplication5.Services
                 Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                Expires = DateTimeToUnixTimestamp(DateTime.UtcNow.AddMinutes(15)),
+                Expires = DateTimeToUnixTimestamp(DateTime.UtcNow.AddMinutes(1)),
                 IssuedAt = DateTimeToUnixTimestamp(DateTime.UtcNow)
             };
 
@@ -36,7 +36,7 @@ namespace WebApplication5.Services
             {
                 UserId = user.Id,
                 Email = user.Email,
-                Expires = DateTimeToUnixTimestamp(DateTime.UtcNow.AddHours(1)), 
+                Expires = DateTimeToUnixTimestamp(DateTime.UtcNow.AddMinutes(2)), 
                 IssuedAt = DateTimeToUnixTimestamp(DateTime.UtcNow),
                 IsRefreshToken = true  
             };

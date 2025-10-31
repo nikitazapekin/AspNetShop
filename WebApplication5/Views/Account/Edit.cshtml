@@ -7,63 +7,162 @@
 <div class="account-container">
     <div class="account-header">
         <h1>Редактирование профиля</h1>
-        <p>Обновите ваши личные данные</p>
+        <p>Изменение личных данных</p>
     </div>
 
-    <div class="edit-form-container">
-        @using (Html.BeginForm("Edit", "Account", FormMethod.Post, new { @class = "edit-form" }))
-        {
-            @Html.AntiForgeryToken()
-
-            <div class="form-group">
-                @Html.LabelFor(m => m.FirstName, "Имя")
-                @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control", placeholder = "Введите ваше имя" })
-                @Html.ValidationMessageFor(m => m.FirstName)
+    <div class="account-content">
+        <div class="profile-card">
+            <div class="profile-header">
+                <h2>Личная информация</h2>
             </div>
 
-            <div class="form-group">
-                @Html.LabelFor(m => m.LastName, "Фамилия")
-                @Html.TextBoxFor(m => m.LastName, new { @class = "form-control", placeholder = "Введите вашу фамилию" })
-                @Html.ValidationMessageFor(m => m.LastName)
-            </div>
+            <form id="editProfileForm" class="profile-form">
+                <div class="form-group full-width-group">
+                    <label for="FirstName" class="form-label">Имя</label>
+                    <input type="text" id="FirstName" name="FirstName" class="form-input full-width-input" value="@Model.FirstName" required>
+                </div>
 
-            <div class="form-group">
-                @Html.LabelFor(m => m.Email, "Email")
-                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", type = "email", placeholder = "Введите ваш email" })
-                @Html.ValidationMessageFor(m => m.Email)
-            </div>
+                <div class="form-group full-width-group">
+                    <label for="LastName" class="form-label">Фамилия</label>
+                    <input type="text" id="LastName" name="LastName" class="form-input full-width-input" value="@Model.LastName" required>
+                </div>
 
-            <div class="form-group">
-                @Html.LabelFor(m => m.Phone, "Телефон")
-                @Html.TextBoxFor(m => m.Phone, new { @class = "form-control", placeholder = "+7 (999) 123-45-67" })
-                @Html.ValidationMessageFor(m => m.Phone)
-            </div>
+                <div class="form-group full-width-group">
+                    <label for="Email" class="form-label">Email</label>
+                    <input type="email" id="Email" name="Email" class="form-input full-width-input" value="@Model.Email" required>
+                </div>
 
-            <div class="form-group">
-                @Html.LabelFor(m => m.Password, "Пароль")
-                @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Введите новый пароль" })
-                @Html.ValidationMessageFor(m => m.Password)
-                <small class="form-text">Оставьте пустым, если не хотите менять пароль</small>
-            </div>
+                <div class="form-group full-width-group">
+                    <label for="Phone" class="form-label">Телефон</label>
+                    <input type="tel" id="Phone" name="Phone" class="form-input full-width-input" value="@Model.Phone">
+                </div>
 
-            <div class="form-actions">
-                <button type="submit" class="btn-save">Сохранить изменения</button>
-                <a href="@Url.Action("Index")" class="btn-cancel">Отмена</a>
-            </div>
-        }
+                <div class="form-group full-width-group">
+                    <label for="Login" class="form-label">Логин</label>
+                    <input type="text" id="Login" name="Login" class="form-input full-width-input" value="@Model.Login" required>
+                </div>
+
+                <div class="form-group full-width-group">
+                    <label for="Password" class="form-label">Новый пароль</label>
+                    <input type="password" id="Password" name="Password" class="form-input full-width-input" placeholder="Оставьте пустым, если не хотите менять">
+              
+                </div>
+
+                <div class="form-actions full-width-actions">
+                    <button type="button" class="btn-cancel" onclick="window.history.back()">Отмена</button>
+                    <button type="submit" class="btn-save">Сохранить изменения</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        checkAuthentication();
+
+        document.getElementById('editProfileForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            updateProfile();
+        });
+    });
+
+    function updateProfile() {
+        const accessToken = localStorage.getItem('accessToken');
+        const formData = new FormData(document.getElementById('editProfileForm'));
+
+        const profileData = {
+            FirstName: document.getElementById('FirstName').value,
+            LastName: document.getElementById('LastName').value,
+            Email: document.getElementById('Email').value,
+            Phone: document.getElementById('Phone').value,
+            Login: document.getElementById('Login').value,
+            Password: document.getElementById('Password').value || null
+        };
+
+        fetch('/auth/updateprofile', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + accessToken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(profileData)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage('Профиль успешно обновлен', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/account';
+                    }, 2000);
+                } else {
+                    showMessage(data.message || 'Ошибка при обновлении профиля', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage('Ошибка при обновлении профиля', 'error');
+            });
+    }
+
+    function checkAuthentication() {
+        const accessToken = localStorage.getItem('accessToken');
+
+        if (!accessToken) {
+            window.location.href = '/signin';
+            return;
+        }
+
+        fetch('/auth/validate', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + accessToken
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.Authenticated) {
+                    localStorage.removeItem('accessToken');
+                    window.location.href = '/signin';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                localStorage.removeItem('accessToken');
+                window.location.href = '/signin';
+            });
+    }
+
+    function showMessage(message, type) {
+        let messageDiv = document.getElementById('message');
+        if (!messageDiv) {
+            messageDiv = document.createElement('div');
+            messageDiv.id = 'message';
+            document.querySelector('.account-container').prepend(messageDiv);
+        }
+
+        messageDiv.textContent = message;
+        messageDiv.className = `message ${type}`;
+        messageDiv.style.display = 'block';
+
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 5000);
+    }
+</script>
+
 <style>
     .account-container {
-        max-width: 600px;
+        max-width: 1000px;
         margin: 0 auto;
         padding: 20px;
+        width: 100%;
     }
 
     .account-header {
         text-align: center;
         margin-bottom: 40px;
+        width: 100%;
     }
 
         .account-header h1 {
@@ -77,17 +176,34 @@
             font-size: 16px;
         }
 
-    .edit-form-container {
+    .profile-card {
         background: white;
         border-radius: 12px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         padding: 30px;
+        margin-bottom: 30px;
+        width: 100%;
+        box-sizing: border-box;
     }
 
-    .edit-form {
+    .profile-header {
+        margin-bottom: 25px;
+        border-bottom: 2px solid #f8f9fa;
+        padding-bottom: 15px;
+        width: 100%;
+    }
+
+        .profile-header h2 {
+            color: #2c3e50;
+            margin: 0;
+            font-size: 24px;
+        }
+
+    .profile-form {
         display: flex;
         flex-direction: column;
         gap: 20px;
+        width: 100%;
     }
 
     .form-group {
@@ -95,53 +211,68 @@
         flex-direction: column;
     }
 
-        .form-group label {
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
+    .full-width-group {
+        width: 100%;
+    }
 
-    .form-control {
+    .form-label {
+        font-weight: bold;
+        color: #2c3e50;
+        margin-bottom: 8px;
+        font-size: 16px;
+        width: 100%;
+    }
+
+    .form-input {
         padding: 12px 15px;
         border: 2px solid #e9ecef;
         border-radius: 6px;
         font-size: 16px;
         transition: border-color 0.3s;
+        box-sizing: border-box;
     }
 
-        .form-control:focus {
-            border-color: #007bff;
-            outline: none;
-        }
-
-    .form-text {
-        color: #6c757d;
-        font-size: 12px;
-        margin-top: 5px;
+    .full-width-input {
+        width: 100% !important;
+        max-width: 100% !important;
+        display: block;
     }
 
-    .field-validation-error {
-        color: #dc3545;
-        font-size: 12px;
+    .form-input:focus {
+        outline: none;
+        border-color: #007bff;
+    }
+
+    .form-hint {
+        color: #666;
+        font-size: 14px;
         margin-top: 5px;
+        width: 100%;
     }
 
     .form-actions {
         display: flex;
         gap: 15px;
-        margin-top: 10px;
+        justify-content: flex-end;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 2px solid #f8f9fa;
+    }
+
+    .full-width-actions {
+        width: 100%;
     }
 
     .btn-save {
         background: #007bff;
         color: white;
-        border: none;
         padding: 12px 30px;
+        border: none;
         border-radius: 6px;
-        font-size: 16px;
+        font-weight: 500;
         cursor: pointer;
         transition: background 0.3s;
+        width: auto;
     }
 
         .btn-save:hover {
@@ -152,10 +283,13 @@
         background: #6c757d;
         color: white;
         padding: 12px 30px;
+        border: none;
         border-radius: 6px;
-        text-decoration: none;
-        text-align: center;
+        font-weight: 500;
+        cursor: pointer;
         transition: background 0.3s;
+        text-decoration: none;
+        width: auto;
     }
 
         .btn-cancel:hover {
@@ -164,9 +298,34 @@
             text-decoration: none;
         }
 
-    @@media (max-width: 768px) {
-        .form-actions {
-            flex-direction: column;
+    .message {
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 6px;
+        font-weight: 500;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
         }
+
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+   
+     
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="password"] {
+        width: 100% !important;
+        max-width: 100% !important;
     }
 </style>
