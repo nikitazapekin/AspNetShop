@@ -8,11 +8,11 @@ namespace WebApplication5.Services
 {
     public class JwtService
     {
-        private readonly string _secretKey;
+      
 
         public JwtService()
         {
-            _secretKey = "secret";
+            
         }
 
         public string GenerateAccessToken(UserProfile user)

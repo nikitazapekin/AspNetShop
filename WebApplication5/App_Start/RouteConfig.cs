@@ -44,17 +44,11 @@ namespace WebApplication5
                 url: "auth/validate",
                 defaults: new { controller = "Auth", action = "Validate" }
             );
-
-
-
-
             routes.MapRoute(
            name: "UpdateCart",
            url: "account/updatecart",
            defaults: new { controller = "Account", action = "UpdateCart" }
        );
-
-
             routes.MapRoute(
                 name: "ProductsCard",
                 url: "products/card/{id}",
@@ -67,21 +61,17 @@ namespace WebApplication5
                 defaults: new { controller = "Products", action = "Index" }
             );
 
-
             routes.MapRoute(
      name: "AccountCorzina",
      url: "account/corzina",
      defaults: new { controller = "Account", action = "Corzina" }
  );
 
-
             routes.MapRoute(
 name: "AccountEdit",
 url: "account/edit",
 defaults: new { controller = "Account", action = "Edit" }
 );
-
-
 
             routes.MapRoute(
                 name: "Account",
@@ -91,7 +81,7 @@ defaults: new { controller = "Account", action = "Edit" }
 
             routes.MapPageRoute("RootRoute", "", "~/Homepage.aspx");
             routes.MapPageRoute("TestRoute", "test", "~/Test.aspx");
-          //  routes.MapPageRoute("DefaultRoute", "", "~/Default.aspx");
+       
             routes.MapPageRoute("RegisterRoute", "register", "~/Register.aspx");
 
 

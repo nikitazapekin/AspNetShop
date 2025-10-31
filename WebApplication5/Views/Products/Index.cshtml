@@ -15,20 +15,13 @@
         <div class="product-card" onclick="location.href='@Url.Action("Card", "Products", new { id = card.Id })'">
             <div class="product-image">
                 <img src="@card.ImageUrl" alt="@card.Name" />
-                @if (card.StockQuantity > 0)
-                {
-                    <span class="stock-badge in-stock">В наличии</span>
-                }
-                else
-                {
-                    <span class="stock-badge out-of-stock">Нет в наличии</span>
-                }
+               
             </div>
             <div class="product-info">
                 <h3 class="product-name">@card.Name</h3>
                 <p class="product-description">@card.Description</p>
                 <div class="product-category">@card.Category</div>
-                <div class="product-price">@card.Price.ToString("N0") ₽</div>
+                <div class="product-price">@card.Price.ToString("N0") руб</div>
                 <div class="product-stock">
                     @if (card.StockQuantity > 0)
                     {
