@@ -5,6 +5,80 @@ VisualStudioVersion = 17.7.34202.233
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication5", "WebApplication5\WebApplication5.csproj", "{A4190D7E-F7E8-49EA-8800-A28A94E1CE1C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ShopProject", "ShopProject", "{22E24FE2-BCC2-417D-BC87-51E904CCAEF6}"
+	ProjectSection(SolutionItems) = preProject
+		Shop.sln = Shop.sln
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shop.DataAccess", "Shop.DataAccess", "{B2F80E9F-FD45-4B21-A826-231F7802B421}"
+	ProjectSection(SolutionItems) = preProject
+		Shop.DataAccess.csproj = Shop.DataAccess.csproj
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Models", "Models", "{2C22C93D-140E-40D0-B829-B555605D3CFB}"
+	ProjectSection(SolutionItems) = preProject
+		Admin.cs = Admin.cs
+		ApplicationUser.cs = ApplicationUser.cs
+		Cart.cs = Cart.cs
+		CartItem.cs = CartItem.cs
+		Customer.cs = Customer.cs
+		Order.cs = Order.cs
+		OrderItem.cs = OrderItem.cs
+		Product.cs = Product.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Contexts", "Contexts", "{94108E13-3912-4130-AB55-55217AC46ED1}"
+	ProjectSection(SolutionItems) = preProject
+		AppIdentityDbContext.cs = AppIdentityDbContext.cs
+		ShopContext.cs = ShopContext.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Migrations", "Migrations", "{0CE21541-9996-4A27-A847-5ADE936EE041}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AppIdentity", "AppIdentity", "{C2F27D5E-59DC-4646-B0D5-939076219E13}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shop", "Shop", "{9F64ED5D-87EA-44C4-9FE2-086747F97FDB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Seeders", "Seeders", "{3CB0C9D4-7F09-4A97-99EB-3938683A95B8}"
+	ProjectSection(SolutionItems) = preProject
+		AppIdentityDbContextSeeder.cs = AppIdentityDbContextSeeder.cs
+		ShopContextSeeder.cs = ShopContextSeeder.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Interfaces", "Interfaces", "{57C0A927-47F3-439F-BD9C-E95F8FEDA0EB}"
+	ProjectSection(SolutionItems) = preProject
+		ICartRepository.cs = ICartRepository.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Repositories", "Repositories", "{9D8859F4-6228-4507-9BEB-0A31AACAD97A}"
+	ProjectSection(SolutionItems) = preProject
+		CartDbRepository.cs = CartDbRepository.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shop.API", "Shop.API", "{61C3ECD2-D8DD-4790-9134-EA79D173E3DD}"
+	ProjectSection(SolutionItems) = preProject
+		appsettings.json = appsettings.json
+		launchSettings.json = launchSettings.json
+		Program.cs = Program.cs
+		Shop.API.csproj = Shop.API.csproj
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Controllers", "Controllers", "{F55B1D5F-9463-41D1-8B94-8B3B8DAFA5A1}"
+	ProjectSection(SolutionItems) = preProject
+		HelloController.cs = HelloController.cs
+		ProductsController.cs = ProductsController.cs
+		TestController.cs = TestController.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shop.Services", "Shop.Services", "{864F69A1-3E40-4384-98B2-6A43D87791B4}"
+	ProjectSection(SolutionItems) = preProject
+		Shop.Services.csproj = Shop.Services.csproj
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Interfaces", "Interfaces", "{DDA2F04A-A12A-44DF-B45C-CA9CBA73D71D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{02D815F4-229F-42B9-994E-89D861618BC8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,6 +92,22 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B2F80E9F-FD45-4B21-A826-231F7802B421} = {22E24FE2-BCC2-417D-BC87-51E904CCAEF6}
+		{2C22C93D-140E-40D0-B829-B555605D3CFB} = {B2F80E9F-FD45-4B21-A826-231F7802B421}
+		{94108E13-3912-4130-AB55-55217AC46ED1} = {B2F80E9F-FD45-4B21-A826-231F7802B421}
+		{0CE21541-9996-4A27-A847-5ADE936EE041} = {B2F80E9F-FD45-4B21-A826-231F7802B421}
+		{C2F27D5E-59DC-4646-B0D5-939076219E13} = {0CE21541-9996-4A27-A847-5ADE936EE041}
+		{9F64ED5D-87EA-44C4-9FE2-086747F97FDB} = {0CE21541-9996-4A27-A847-5ADE936EE041}
+		{3CB0C9D4-7F09-4A97-99EB-3938683A95B8} = {B2F80E9F-FD45-4B21-A826-231F7802B421}
+		{57C0A927-47F3-439F-BD9C-E95F8FEDA0EB} = {B2F80E9F-FD45-4B21-A826-231F7802B421}
+		{9D8859F4-6228-4507-9BEB-0A31AACAD97A} = {B2F80E9F-FD45-4B21-A826-231F7802B421}
+		{61C3ECD2-D8DD-4790-9134-EA79D173E3DD} = {22E24FE2-BCC2-417D-BC87-51E904CCAEF6}
+		{F55B1D5F-9463-41D1-8B94-8B3B8DAFA5A1} = {61C3ECD2-D8DD-4790-9134-EA79D173E3DD}
+		{864F69A1-3E40-4384-98B2-6A43D87791B4} = {22E24FE2-BCC2-417D-BC87-51E904CCAEF6}
+		{DDA2F04A-A12A-44DF-B45C-CA9CBA73D71D} = {864F69A1-3E40-4384-98B2-6A43D87791B4}
+		{02D815F4-229F-42B9-994E-89D861618BC8} = {864F69A1-3E40-4384-98B2-6A43D87791B4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BC8DEA89-BEB8-4F3F-B841-FAA16CC3DFE3}

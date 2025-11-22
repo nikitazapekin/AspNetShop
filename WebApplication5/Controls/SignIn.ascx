@@ -26,10 +26,10 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('btnSignIn').addEventListener('click', function() {
-        const loginData = {
-            Login: document.getElementById('<%= txtLogin.ClientID %>').value,
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('btnSignIn').addEventListener('click', function () {
+            const loginData = {
+                Login: document.getElementById('<%= txtLogin.ClientID %>').value,
             Password: document.getElementById('<%= txtPassword.ClientID %>').value
         };
 
@@ -37,27 +37,44 @@ document.addEventListener('DOMContentLoaded', function() {
             showMessage('Заполните все поля', 'error');
             return;
         }
-        
-        fetch('/auth/login', {
+
+        // ИЗМЕНЕНИЕ: Отправляем запрос на новый бэкенд
+        fetch('https://localhost:7276/api/Account/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(loginData)
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                localStorage.setItem('accessToken', data.accessToken);
-                window.location.href = data.redirectUrl;
-            } else {
-                showMessage(data.message, 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showMessage('Ошибка сети', 'error');
-        });
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Login response:", data);
+                if (data.success) {
+                    // Сохраняем access token в localStorage
+                    localStorage.setItem('accessToken', data.accessToken);
+
+                    // Устанавливаем заголовок Authorization для будущих запросов
+                    localStorage.setItem('authHeader', 'Bearer ' + data.accessToken);
+
+                    showMessage('Вход успешен! Перенаправление...', 'success');
+
+                    // Перенаправляем через 1 секунду
+                    setTimeout(() => {
+                        window.location.href = data.redirectUrl || '/account';
+                    }, 1000);
+                } else {
+                    showMessage(data.message || 'Ошибка входа', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage('Ошибка сети или сервера', 'error');
+            });
     });
 
     function showMessage(message, type) {
@@ -65,6 +82,38 @@ document.addEventListener('DOMContentLoaded', function() {
         messageDiv.textContent = message;
         messageDiv.className = `message ${type}`;
         messageDiv.style.display = 'block';
+
+        // Автоматически скрываем сообщение через 5 секунд
+        if (type === 'success') {
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+    }
+
+    // Проверяем, есть ли уже токен (автоматический вход)
+    const existingToken = localStorage.getItem('accessToken');
+    if (existingToken) {
+        console.log('Found existing token, user might be already logged in');
     }
 });
 </script>
+
+<style>
+.message {
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+    font-weight: bold;
+}
+.message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+.message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+</style>

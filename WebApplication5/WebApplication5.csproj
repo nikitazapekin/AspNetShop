@@ -274,9 +274,11 @@
     <Content Include="ONas.aspx" />
     <Content Include="publish.xml" />
     <Content Include="Readme\assets\about.png" />
+    <Content Include="Readme\assets\apsx.png" />
     <Content Include="Readme\assets\auth.png" />
     <Content Include="Readme\assets\cabinet.png" />
     <Content Include="Readme\assets\contact.png" />
+    <Content Include="Readme\assets\controls.png" />
     <Content Include="Readme\assets\corzina.png" />
     <Content Include="Readme\assets\edit.png" />
     <Content Include="Readme\assets\homepage.png" />
@@ -284,6 +286,7 @@
     <Content Include="Readme\assets\products.png" />
     <Content Include="Readme\assets\register.png" />
     <Content Include="Readme\assets\udochki.png" />
+    <Content Include="Readme\assets\views.png" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />
@@ -291,6 +294,7 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Readme\Readme.md" />
+    <Content Include="Readme\Structure.md" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
     <Content Include="Scripts\jquery-3.4.1.min.js" />
@@ -324,6 +328,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="NewFolder1\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />

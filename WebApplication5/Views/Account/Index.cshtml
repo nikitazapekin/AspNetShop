@@ -73,14 +73,14 @@
     });
 
     function checkAuthentication() {
-        const accessToken = localStorage.getItem('accessToken');
+     const accessToken = localStorage.getItem('accessToken');
 
         if (!accessToken) {
             window.location.href = '/signin';
             return;
         }
 
-        fetch('/auth/validate', {
+        fetch('https://localhost:7276/api/Account/validate', {
             method: 'GET',
             headers: {
                 'Authorization': 'Bearer ' + accessToken
@@ -90,16 +90,17 @@
             .then(data => {
                 console.log("Validation response:", data);
                 if (!data.Authenticated) {
-                    localStorage.removeItem('accessToken');
-                    window.location.href = '/signin';
+                  //  localStorage.removeItem('accessToken');
+                //   window.location.href = '/signin';
                 }
               
             })
             .catch(error => {
                 console.error('Error:', error);
-                localStorage.removeItem('accessToken');
-                window.location.href = '/signin';
+               //localStorage.removeItem('accessToken');
+              //  window.location.href = '/signin';
             });
+            
     }
 
     function logout() {
