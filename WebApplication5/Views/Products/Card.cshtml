@@ -31,6 +31,9 @@
 </div>
 
 <script>
+    // Глобальная переменная для отслеживания состояния запроса
+    let isAddingToCart = false;
+
     document.addEventListener('DOMContentLoaded', function () {
         loadProduct();
     });
@@ -118,11 +121,20 @@
 
     // Обработчик добавления в корзину
     document.getElementById('addToCartBtn').addEventListener('click', function () {
+        if (isAddingToCart) {
+            return; // Игнорируем повторные нажатия
+        }
+
         const productId = getProductIdFromUrl();
         addToCart(productId);
     });
 
     function addToCart(productId) {
+        // Проверяем, не выполняется ли уже запрос
+        if (isAddingToCart) {
+            return;
+        }
+
         const accessToken = localStorage.getItem('accessToken');
 
         if (!accessToken) {
@@ -131,11 +143,15 @@
             return;
         }
 
+        // Устанавливаем флаг выполнения запроса
+        isAddingToCart = true;
+
         // Показываем индикатор загрузки
         const addButton = document.getElementById('addToCartBtn');
         const originalText = addButton.textContent;
         addButton.textContent = 'Добавляем...';
         addButton.disabled = true;
+        addButton.style.backgroundColor = '#6c757d';
 
         fetch('https://localhost:7276/api/Cart/add', {
             method: 'POST',
@@ -168,11 +184,17 @@
                 showSuccessMessage('Товар успешно добавлен в корзину!');
 
                 // Обновляем информацию о наличии
-                updateStockAfterAdd(purchase.count);
+                updateStockAfterAdd(1); // Всегда добавляем только 1 штуку
 
-                // Восстанавливаем кнопку
-                addButton.textContent = originalText;
-                addButton.disabled = false;
+                // Блокируем кнопку после успешного добавления
+                addButton.textContent = 'Добавлено в корзину';
+                addButton.style.backgroundColor = '#28a745';
+                addButton.disabled = true;
+
+                // Устанавливаем таймер для разблокировки кнопки через 3 секунды
+                setTimeout(() => {
+                    resetAddButton();
+                }, 3000);
             })
             .catch(error => {
                 console.error('Error adding to cart:', error);
@@ -187,10 +209,20 @@
                     showErrorMessage('Ошибка при добавлении в корзину: ' + error.message);
                 }
 
-                // Восстанавливаем кнопку
-                addButton.textContent = originalText;
-                addButton.disabled = false;
+                // Восстанавливаем кнопку при ошибке
+                resetAddButton();
+            })
+            .finally(() => {
+                // Сбрасываем флаг выполнения запроса
+                isAddingToCart = false;
             });
+    }
+
+    function resetAddButton() {
+        const addButton = document.getElementById('addToCartBtn');
+        addButton.textContent = 'Добавить в корзину';
+        addButton.disabled = false;
+        addButton.style.backgroundColor = '#007bff';
     }
 
     function updateStockAfterAdd(quantityAdded) {
@@ -270,7 +302,7 @@
         notification.textContent = message;
         notification.style.display = 'block';
 
-        // Автоматически скрываем через 5 секунд
+        // Автоматически скрываем через 5 секунды
         setTimeout(() => {
             notification.style.display = 'none';
         }, 5000);
