@@ -19,33 +19,22 @@
             <form id="editProfileForm" class="profile-form">
                 <div class="form-group full-width-group">
                     <label for="FirstName" class="form-label">Имя</label>
-                    <input type="text" id="FirstName" name="FirstName" class="form-input full-width-input" value="@Model.FirstName" required>
+                    <input type="text" id="FirstName" name="FirstName" class="form-input full-width-input" required>
                 </div>
 
                 <div class="form-group full-width-group">
                     <label for="LastName" class="form-label">Фамилия</label>
-                    <input type="text" id="LastName" name="LastName" class="form-input full-width-input" value="@Model.LastName" required>
+                    <input type="text" id="LastName" name="LastName" class="form-input full-width-input" required>
                 </div>
 
                 <div class="form-group full-width-group">
                     <label for="Email" class="form-label">Email</label>
-                    <input type="email" id="Email" name="Email" class="form-input full-width-input" value="@Model.Email" required>
+                    <input type="email" id="Email" name="Email" class="form-input full-width-input" required>
                 </div>
 
                 <div class="form-group full-width-group">
                     <label for="Phone" class="form-label">Телефон</label>
-                    <input type="tel" id="Phone" name="Phone" class="form-input full-width-input" value="@Model.Phone">
-                </div>
-
-                <div class="form-group full-width-group">
-                    <label for="Login" class="form-label">Логин</label>
-                    <input type="text" id="Login" name="Login" class="form-input full-width-input" value="@Model.Login" required>
-                </div>
-
-                <div class="form-group full-width-group">
-                    <label for="Password" class="form-label">Новый пароль</label>
-                    <input type="password" id="Password" name="Password" class="form-input full-width-input" placeholder="Оставьте пустым, если не хотите менять">
-              
+                    <input type="tel" id="Phone" name="Phone" class="form-input full-width-input">
                 </div>
 
                 <div class="form-actions full-width-actions">
@@ -59,7 +48,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        checkAuthentication();
+        checkAuthenticationAndLoadProfile();
 
         document.getElementById('editProfileForm').addEventListener('submit', function (e) {
             e.preventDefault();
@@ -67,20 +56,71 @@
         });
     });
 
+    function checkAuthenticationAndLoadProfile() {
+        const accessToken = localStorage.getItem('accessToken');
+
+        if (!accessToken) {
+            window.location.href = '/signin';
+            return;
+        }
+
+        // Загружаем данные профиля
+        loadUserProfile();
+    }
+
+    function loadUserProfile() {
+        const accessToken = localStorage.getItem('accessToken');
+
+        fetch('https://localhost:7276/api/Account/profile', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + accessToken,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Profile data received:', data); // Для отладки
+                if (data.success) {
+                    // Заполняем форму данными пользователя
+                    populateForm(data.user);
+                } else {
+                    showMessage(data.message || 'Ошибка при загрузке профиля', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading profile:', error);
+                showMessage('Ошибка при загрузке профиля', 'error');
+            });
+    }
+
+    function populateForm(userData) {
+        console.log('Populating form with:', userData); // Для отладки
+
+        // Используем camelCase, так как API возвращает в camelCase
+        document.getElementById('FirstName').value = userData.firstName || '';
+        document.getElementById('LastName').value = userData.lastName || '';
+        document.getElementById('Email').value = userData.email || '';
+        document.getElementById('Phone').value = userData.phone || '';
+    }
+
     function updateProfile() {
         const accessToken = localStorage.getItem('accessToken');
-        const formData = new FormData(document.getElementById('editProfileForm'));
 
         const profileData = {
             FirstName: document.getElementById('FirstName').value,
             LastName: document.getElementById('LastName').value,
             Email: document.getElementById('Email').value,
             Phone: document.getElementById('Phone').value,
-            Login: document.getElementById('Login').value,
-            Password: document.getElementById('Password').value || null
         };
 
-        fetch('/auth/updateprofile', {
+        // Используем тот же endpoint что и для получения профиля, но метод POST
+        fetch('https://localhost:7276/api/Account/updateprofile', {
             method: 'POST',
             headers: {
                 'Authorization': 'Bearer ' + accessToken,
@@ -88,7 +128,12 @@
             },
             body: JSON.stringify(profileData)
         })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     showMessage('Профиль успешно обновлен', 'success');
@@ -102,34 +147,6 @@
             .catch(error => {
                 console.error('Error:', error);
                 showMessage('Ошибка при обновлении профиля', 'error');
-            });
-    }
-
-    function checkAuthentication() {
-        const accessToken = localStorage.getItem('accessToken');
-
-        if (!accessToken) {
-            window.location.href = '/signin';
-            return;
-        }
-
-        fetch('/auth/validate', {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + accessToken
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (!data.Authenticated) {
-                    localStorage.removeItem('accessToken');
-                    window.location.href = '/signin';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                localStorage.removeItem('accessToken');
-                window.location.href = '/signin';
             });
     }
 
@@ -152,6 +169,7 @@
 </script>
 
 <style>
+    /* Ваши существующие стили остаются без изменений */
     .account-container {
         max-width: 1000px;
         margin: 0 auto;
@@ -319,8 +337,6 @@
             border: 1px solid #f5c6cb;
         }
 
-   
-     
     input[type="text"],
     input[type="email"],
     input[type="tel"],
