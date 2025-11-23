@@ -91,10 +91,12 @@
         if (product.count > 0) {
             stockElement.innerHTML = '<span class="in-stock">В наличии: ' + product.count + ' шт.</span>';
             document.getElementById('addToCartBtn').disabled = false;
+            document.getElementById('addToCartBtn').style.backgroundColor = '#007bff';
         } else {
             stockElement.innerHTML = '<span class="out-of-stock">Нет в наличии</span>';
             document.getElementById('addToCartBtn').disabled = true;
             document.getElementById('addToCartBtn').style.backgroundColor = '#6c757d';
+            document.getElementById('addToCartBtn').textContent = 'Нет в наличии';
         }
 
         // Обновляем title страницы
@@ -121,9 +123,157 @@
     });
 
     function addToCart(productId) {
-        // Здесь будет логика добавления в корзину
-        alert('Товар с ID ' + productId + ' добавлен в корзину!');
-        // В будущем можно добавить вызов API для добавления в корзину
+        const accessToken = localStorage.getItem('accessToken');
+
+        if (!accessToken) {
+            alert('Для добавления товара в корзину необходимо авторизоваться');
+            window.location.href = '/signin';
+            return;
+        }
+
+        // Показываем индикатор загрузки
+        const addButton = document.getElementById('addToCartBtn');
+        const originalText = addButton.textContent;
+        addButton.textContent = 'Добавляем...';
+        addButton.disabled = true;
+
+        fetch('https://localhost:7276/api/Cart/add', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + accessToken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                tovarId: parseInt(productId),
+                quantity: 1
+            })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        throw new Error('Неавторизованный доступ');
+                    } else if (response.status === 400) {
+                        return response.json().then(data => {
+                            throw new Error(data.message || 'Товар не найден или недостаточно на складе');
+                        });
+                    }
+                    throw new Error('Ошибка при добавлении в корзину');
+                }
+                return response.json();
+            })
+            .then(purchase => {
+                console.log('Товар добавлен в корзину:', purchase);
+
+                // Показываем уведомление об успехе
+                showSuccessMessage('Товар успешно добавлен в корзину!');
+
+                // Обновляем информацию о наличии
+                updateStockAfterAdd(purchase.count);
+
+                // Восстанавливаем кнопку
+                addButton.textContent = originalText;
+                addButton.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error adding to cart:', error);
+
+                // Показываем ошибку
+                if (error.message.includes('недостаточно') || error.message.includes('не найден')) {
+                    showErrorMessage('Не удалось добавить товар в корзину: ' + error.message);
+                } else if (error.message.includes('Неавторизованный')) {
+                    alert('Для добавления товара в корзину необходимо авторизоваться');
+                    window.location.href = '/signin';
+                } else {
+                    showErrorMessage('Ошибка при добавлении в корзину: ' + error.message);
+                }
+
+                // Восстанавливаем кнопку
+                addButton.textContent = originalText;
+                addButton.disabled = false;
+            });
+    }
+
+    function updateStockAfterAdd(quantityAdded) {
+        // Обновляем отображение количества на складе
+        const stockElement = document.getElementById('productStock');
+        const currentStockText = stockElement.textContent;
+        const currentStockMatch = currentStockText.match(/В наличии: (\d+) шт\./);
+
+        if (currentStockMatch) {
+            const currentStock = parseInt(currentStockMatch[1]);
+            const newStock = currentStock - quantityAdded;
+
+            if (newStock > 0) {
+                stockElement.innerHTML = '<span class="in-stock">В наличии: ' + newStock + ' шт.</span>';
+            } else {
+                stockElement.innerHTML = '<span class="out-of-stock">Нет в наличии</span>';
+                document.getElementById('addToCartBtn').disabled = true;
+                document.getElementById('addToCartBtn').style.backgroundColor = '#6c757d';
+                document.getElementById('addToCartBtn').textContent = 'Нет в наличии';
+            }
+        }
+    }
+
+    function showSuccessMessage(message) {
+        // Создаем или находим элемент для уведомления
+        let notification = document.getElementById('successNotification');
+        if (!notification) {
+            notification = document.createElement('div');
+            notification.id = 'successNotification';
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #28a745;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 6px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                z-index: 1000;
+                font-weight: 500;
+                max-width: 300px;
+            `;
+            document.body.appendChild(notification);
+        }
+
+        notification.textContent = message;
+        notification.style.display = 'block';
+
+        // Автоматически скрываем через 3 секунды
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 3000);
+    }
+
+    function showErrorMessage(message) {
+        // Создаем или находим элемент для уведомления об ошибке
+        let notification = document.getElementById('errorNotification');
+        if (!notification) {
+            notification = document.createElement('div');
+            notification.id = 'errorNotification';
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #dc3545;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 6px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                z-index: 1000;
+                font-weight: 500;
+                max-width: 300px;
+            `;
+            document.body.appendChild(notification);
+        }
+
+        notification.textContent = message;
+        notification.style.display = 'block';
+
+        // Автоматически скрываем через 5 секунд
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 5000);
     }
 </script>
 
@@ -229,6 +379,7 @@
         font-size: 16px;
         cursor: pointer;
         transition: background 0.3s;
+        flex: 1;
     }
 
         .btn-add-to-cart:hover {
@@ -254,5 +405,6 @@
         .btn-back:hover {
             background: #545b62;
         }
- 
+
+    
 </style>
