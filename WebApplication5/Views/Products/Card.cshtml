@@ -1,39 +1,131 @@
-﻿@model WebApplication5.Models.Card
-@{
-    ViewBag.Title = Model.Name;
+﻿@{
+    ViewBag.Title = "Карточка товара";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="card-detail">
     <div class="card-detail-content">
-        <div class="card-image">
-            <img src="@Model.ImageUrl" alt="@Model.Name" />
-        </div>
-        <div class="card-info">
-            <h1>@Model.Name</h1>
-            <div class="card-category">@Model.Category</div>
-            <div class="card-price">@Model.Price.ToString() Руб</div>
-            <div class="card-stock">
-                @if (Model.StockQuantity > 0)
-                {
-                    <span class="in-stock">В наличии: @Model.StockQuantity шт.</span>
-                }
-                else
-                {
-                    <span class="out-of-stock"> Нет в наличии</span>
-                }
+        <div id="loadingMessage">Загрузка товара...</div>
+        <div id="errorMessage" style="display: none;"></div>
+
+        <div id="productContent" style="display: none;">
+            <div class="card-image">
+                <img id="productImage" src="" alt="" />
             </div>
-            <div class="card-description">
-                <h3>Описание</h3>
-                <p>@Model.Description</p>
-            </div>
-            <div class="card-actions">
-                <button class="btn-add-to-cart">Добавить в корзину</button>
-                <button class="btn-back" onclick="history.back()">Назад к каталогу</button>
+            <div class="card-info">
+                <h1 id="productName"></h1>
+                <div class="card-category" id="productCategory"></div>
+                <div class="card-price" id="productPrice"></div>
+                <div class="card-stock" id="productStock"></div>
+                <div class="card-description">
+                    <h3>Описание</h3>
+                    <p id="productDescription"></p>
+                </div>
+                <div class="card-actions">
+                    <button class="btn-add-to-cart" id="addToCartBtn">Добавить в корзину</button>
+                    <button class="btn-back" onclick="history.back()">Назад к каталогу</button>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        loadProduct();
+    });
+
+    function getProductIdFromUrl() {
+        const path = window.location.pathname;
+        const segments = path.split('/');
+        return segments[segments.length - 1];
+    }
+
+    function loadProduct() {
+        const productId = getProductIdFromUrl();
+
+        if (!productId || isNaN(productId)) {
+            showError('Неверный ID товара');
+            return;
+        }
+
+        fetch(`https://localhost:7276/api/Tovars/${productId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Товар не найден');
+                }
+                return response.json();
+            })
+            .then(product => {
+                console.log('Received product:', product);
+                displayProduct(product);
+            })
+            .catch(error => {
+                console.error('Error loading product:', error);
+                showError('Ошибка загрузки товара: ' + error.message);
+            });
+    }
+
+    function displayProduct(product) {
+        // Скрываем сообщение о загрузке
+        document.getElementById('loadingMessage').style.display = 'none';
+
+        // Заполняем данные товара
+        document.getElementById('productName').textContent = product.title || 'Название не указано';
+        document.getElementById('productCategory').textContent = 'Рыбацкие удочки';
+        document.getElementById('productPrice').textContent = (product.price ? parseInt(product.price).toLocaleString('ru-RU') : '0') + ' Руб';
+        document.getElementById('productDescription').textContent = product.description || 'Описание отсутствует';
+
+        // Устанавливаем изображение
+        const productImage = document.getElementById('productImage');
+        productImage.src = product.image || 'https://via.placeholder.com/500x400?text=No+Image';
+        productImage.alt = product.title || 'Товар';
+
+        // Обработка ошибки загрузки изображения
+        productImage.onerror = function () {
+            this.src = 'https://via.placeholder.com/500x400?text=No+Image';
+        };
+
+        // Отображаем наличие
+        const stockElement = document.getElementById('productStock');
+        if (product.count > 0) {
+            stockElement.innerHTML = '<span class="in-stock">В наличии: ' + product.count + ' шт.</span>';
+            document.getElementById('addToCartBtn').disabled = false;
+        } else {
+            stockElement.innerHTML = '<span class="out-of-stock">Нет в наличии</span>';
+            document.getElementById('addToCartBtn').disabled = true;
+            document.getElementById('addToCartBtn').style.backgroundColor = '#6c757d';
+        }
+
+        // Обновляем title страницы
+        document.title = product.title + ' - Рыбацкие удочки';
+
+        // Показываем контент
+        document.getElementById('productContent').style.display = 'grid';
+    }
+
+    function showError(message) {
+        document.getElementById('loadingMessage').style.display = 'none';
+        document.getElementById('errorMessage').style.display = 'block';
+        document.getElementById('errorMessage').textContent = message;
+        document.getElementById('errorMessage').style.color = '#dc3545';
+        document.getElementById('errorMessage').style.padding = '20px';
+        document.getElementById('errorMessage').style.textAlign = 'center';
+        document.getElementById('errorMessage').style.fontSize = '18px';
+    }
+
+    // Обработчик добавления в корзину
+    document.getElementById('addToCartBtn').addEventListener('click', function () {
+        const productId = getProductIdFromUrl();
+        addToCart(productId);
+    });
+
+    function addToCart(productId) {
+        // Здесь будет логика добавления в корзину
+        alert('Товар с ID ' + productId + ' добавлен в корзину!');
+        // В будущем можно добавить вызов API для добавления в корзину
+    }
+</script>
 
 <style>
     .card-detail {
@@ -43,13 +135,25 @@
     }
 
     .card-detail-content {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 40px;
+        display: block;
         background: white;
         border-radius: 12px;
         padding: 30px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        min-height: 500px;
+    }
+
+    #loadingMessage {
+        text-align: center;
+        padding: 40px;
+        font-size: 18px;
+        color: #666;
+    }
+
+    #productContent {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
     }
 
     .card-image img {
@@ -129,6 +233,11 @@
 
         .btn-add-to-cart:hover {
             background: #0056b3;
+        }
+
+        .btn-add-to-cart:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
         }
 
     .btn-back {

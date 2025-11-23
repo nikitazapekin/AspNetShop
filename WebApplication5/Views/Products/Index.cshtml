@@ -9,33 +9,71 @@
     <p>Широкий выбор качественных удочек для профессиональной и любительской рыбалки</p>
 </div>
 
-<div class="products-grid">
-    @foreach (var card in Model)
-    {
-        <div class="product-card" onclick="location.href='@Url.Action("Card", "Products", new { id = card.Id })'">
-            <div class="product-image">
-                <img src="@card.ImageUrl" alt="@card.Name" />
-               
-            </div>
-            <div class="product-info">
-                <h3 class="product-name">@card.Name</h3>
-                <p class="product-description">@card.Description</p>
-                <div class="product-category">@card.Category</div>
-                <div class="product-price">@card.Price.ToString("N0") руб</div>
-                <div class="product-stock">
-                    @if (card.StockQuantity > 0)
-                    {
-                        <span class="stock-text">Осталось: @card.StockQuantity шт.</span>
-                    }
-                    else
-                    {
-                        <span class="stock-text out-of-stock-text">Нет в наличии</span>
-                    }
+<div id="productsContainer" class="products-grid">
+    <!-- Товары будут загружены через JavaScript -->
+    <div class="loading">Загрузка товаров...</div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        loadProducts();
+    });
+
+    function loadProducts() {
+        fetch('https://localhost:7276/api/Tovars')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(tovars => {
+                console.log('Received products:', tovars);
+                displayProducts(tovars);
+            })
+            .catch(error => {
+                console.error('Error loading products:', error);
+                document.getElementById('productsContainer').innerHTML =
+                    '<div class="error">Ошибка загрузки товаров: ' + error.message + '</div>';
+            });
+    }
+
+    function displayProducts(tovars) {
+        const container = document.getElementById('productsContainer');
+
+        if (!tovars || tovars.length === 0) {
+            container.innerHTML = '<div class="no-products">Товары не найдены</div>';
+            return;
+        }
+
+        const productsHTML = tovars.map(tovar => `
+            <div class="product-card" onclick="location.href='/Products/Card/${tovar.id}'">
+                <div class="product-image">
+                    <img src="${tovar.image || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="${tovar.title}"
+                         onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'" />
+                    ${tovar.count > 0 ?
+                '<div class="stock-badge in-stock">В наличии</div>' :
+                '<div class="stock-badge out-of-stock">Нет в наличии</div>'
+            }
+                </div>
+                <div class="product-info">
+                    <h3 class="product-name">${tovar.title}</h3>
+                    <p class="product-description">${tovar.description || 'Описание отсутствует'}</p>
+                    <div class="product-category">Рыбацкие удочки</div>
+                    <div class="product-price">${parseInt(tovar.price).toLocaleString('ru-RU')} руб</div>
+                    <div class="product-stock">
+                        ${tovar.count > 0 ?
+                `<span class="stock-text">Осталось: ${tovar.count} шт.</span>` :
+                `<span class="stock-text out-of-stock-text">Нет в наличии</span>`
+            }
+                    </div>
                 </div>
             </div>
-        </div>
+        `).join('');
+
+        container.innerHTML = productsHTML;
     }
-</div>
+</script>
 
 <style>
     .products-header {
@@ -56,6 +94,20 @@
             max-width: 600px;
             margin: 0 auto;
         }
+
+    .loading, .error, .no-products {
+        text-align: center;
+        padding: 40px;
+        font-size: 18px;
+        color: #666;
+        grid-column: 1 / -1;
+    }
+
+    .error {
+        color: #dc3545;
+        background: #f8d7da;
+        border-radius: 8px;
+    }
 
     .products-grid {
         display: grid;
@@ -169,6 +221,4 @@
     .out-of-stock-text {
         color: #dc3545;
     }
-
- 
 </style>
