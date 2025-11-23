@@ -1,293 +1,841 @@
-﻿@model WebApplication5.Models.UserProfile
-@{
-    ViewBag.Title = "Личный кабинет";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
-
-<div class="account-container">
-    <div class="account-header">
-        <h1>Личный кабинет</h1>
-        <p>Управление вашими данными и заказами</p>
-    </div>
-
-    <div class="account-content">
-        <div class="profile-card">
-            <div class="profile-header">
-                <h2>Профиль пользователя</h2>
-              
-            </div>
-
-            <div class="profile-info">
-                <div class="info-row">
-                    <span class="info-label">Имя:</span>
-                    <span class="info-value">@Model.FirstName</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Фамилия:</span>
-                    <span class="info-value">@Model.LastName</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Email:</span>
-                    <span class="info-value">@Model.Email</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Телефон:</span>
-                    <span class="info-value">@Model.Phone</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="account-actions">
-            <a href="@Url.Action("Corzina")" class="action-card">
-                <div class="action-text">
-                    <h3>Корзина</h3>
-                    <p>Просмотр и управление корзиной</p>
-                </div>
-            </a>
-
-            <a href="@Url.Action("Edit")" class="action-card">
-                <div class="action-text">
-                    <h3>Редактировать профиль</h3>
-                    <p>Изменение личных данных</p>
-                </div>
-            </a>
-
-            <button id="logoutBtn" class="action-card" style="cursor: pointer; border: none; background: white; width: 100%; text-align: left;">
-                <div class="action-text">
-                    <h3>Выйти</h3>
-                    <p>Завершение текущей сессии</p>
-                </div>
-            </button>
-        </div>
-    </div>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-       
-        checkAuthentication();
- 
-        document.getElementById('logoutBtn').addEventListener('click', function () {
-            logout();
-        });
-    });
-
-    function checkAuthentication() {
-     const accessToken = localStorage.getItem('accessToken');
-
-        if (!accessToken) {
-            window.location.href = '/signin';
-            return;
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Личный кабинет</title>
+    <style>
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
         }
 
-        fetch('https://localhost:7276/api/Account/validate', {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + accessToken
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Validation response:", data);
-                if (!data.Authenticated) {
-                  //  localStorage.removeItem('accessToken');
-                //   window.location.href = '/signin';
-                }
-              
-            })
-            .catch(error => {
-                console.error('Error:', error);
-               //localStorage.removeItem('accessToken');
-              //  window.location.href = '/signin';
-            });
-            
-    }
-
-    function logout() {
-        const accessToken = localStorage.getItem('accessToken');
-
-        fetch('/auth/logout', {
-            method: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + accessToken,
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    localStorage.removeItem('accessToken');
-                    window.location.href = data.redirectUrl || '/signin';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                localStorage.removeItem('accessToken');
-                window.location.href = '/signin';
-            });
-    }
-
-    function showMessage(message, type) {
-        
-        let messageDiv = document.getElementById('message');
-        if (!messageDiv) {
-            messageDiv = document.createElement('div');
-            messageDiv.id = 'message';
-            messageDiv.style.cssText = 'padding: 10px; margin: 10px 0; border-radius: 4px; display: none;';
-            document.querySelector('.account-container').prepend(messageDiv);
-        }
-
-        messageDiv.textContent = message;
-        messageDiv.className = `message ${type}`;
-        messageDiv.style.display = 'block';
-
-        setTimeout(() => {
-            messageDiv.style.display = 'none';
-        }, 5000);
-    }
-</script>
-
-<style>
-    .account-container {
-        max-width: 1000px;
-        margin: 0 auto;
-        padding: 20px;
-    }
-
-    .account-header {
-        text-align: center;
-        margin-bottom: 40px;
-    }
-
-        .account-header h1 {
-            color: #2c3e50;
-            margin-bottom: 10px;
-            font-size: 32px;
-        }
-
-        .account-header p {
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 18px;
             color: #666;
-            font-size: 16px;
         }
 
-    .profile-card {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        padding: 30px;
-        margin-bottom: 30px;
-    }
-
-    .profile-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 25px;
-        border-bottom: 2px solid #f8f9fa;
-        padding-bottom: 15px;
-    }
-
-        .profile-header h2 {
-            color: #2c3e50;
-            margin: 0;
-            font-size: 24px;
+        .error {
+            text-align: center;
+            padding: 50px;
+            color: #dc3545;
         }
 
-    .btn-edit {
-        background: #007bff;
-        color: white;
-        padding: 10px 20px;
-        border-radius: 6px;
-        text-decoration: none;
-        font-weight: 500;
-        transition: background 0.3s;
-    }
-
-        .btn-edit:hover {
-            background: #0056b3;
-            color: white;
-            text-decoration: none;
+        /* Стили для customer */
+        .customer-ui {
+            display: none;
         }
 
-    .profile-info {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
+        .profile-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
 
-    .info-row {
-        display: flex;
-        align-items: center;
-        padding: 12px 0;
-        border-bottom: 1px solid #f8f9fa;
-    }
+        .account-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
 
-    .info-label {
-        font-weight: bold;
-        color: #2c3e50;
-        width: 120px;
-        font-size: 16px;
-    }
-
-    .info-value {
-        color: #666;
-        font-size: 16px;
-    }
-
-    .account-actions {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 20px;
-    }
-
-    .action-card {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        padding: 25px;
-        text-decoration: none;
-        color: inherit;
-        transition: transform 0.3s;
-        display: flex;
-        align-items: center;
-        gap: 20px;
-    }
-
-        .action-card:hover {
-            transform: translateY(-3px);
+        .action-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 25px;
             text-decoration: none;
             color: inherit;
+            transition: transform 0.3s;
         }
 
-    .action-text h3 {
-        color: #2c3e50;
-        margin: 0 0 5px 0;
-        font-size: 18px;
-    }
+            .action-card:hover {
+                transform: translateY(-3px);
+                text-decoration: none;
+                color: inherit;
+            }
 
-    .action-text p {
-        color: #666;
-        margin: 0;
-        font-size: 14px;
-    }
-
-    .message {
-        padding: 10px;
-        margin: 10px 0;
-        border-radius: 4px;
-    }
-
-        .message.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+        /* Стили для admin */
+        .admin-ui {
+            display: none;
         }
 
-        .message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+        .admin-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
         }
 
-   
-</style>
+            .admin-card:hover {
+                background: #e9ecef;
+                transform: translateY(-2px);
+            }
+
+        /* Общие стили */
+        .message {
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+            display: none;
+        }
+
+            .message.success {
+                background-color: #d4edda;
+                color: #155724;
+                border: 1px solid #c3e6cb;
+            }
+
+            .message.error {
+                background-color: #f8d7da;
+                color: #721c24;
+                border: 1px solid #f5c6cb;
+            }
+
+            .message.info {
+                background-color: #d1ecf1;
+                color: #0c5460;
+                border: 1px solid #bee5eb;
+            }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .role-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        .role-admin {
+            background: #ffd700;
+            color: #000;
+        }
+
+        .role-customer {
+            background: #007bff;
+            color: white;
+        }
+
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+            .close:hover {
+                color: #000;
+            }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+            .form-input:focus {
+                outline: none;
+                border-color: #007bff;
+                box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+            }
+
+        .form-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            min-height: 100px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        /* Стили для карточек товаров */
+        .tovar-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: box-shadow 0.3s;
+        }
+
+            .tovar-card:hover {
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            }
+
+        .tovar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .tovar-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+            color: #333;
+        }
+
+        .tovar-price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #28a745;
+            margin: 5px 0;
+        }
+
+        .tovar-count {
+            color: #666;
+            margin: 5px 0;
+        }
+
+        .tovar-description {
+            color: #666;
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+
+        .tovar-tags {
+            margin-top: 10px;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #e9ecef;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            margin-right: 8px;
+            margin-bottom: 5px;
+            color: #495057;
+        }
+
+        .tovar-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Загрузка -->
+        <div id="loading" class="loading">
+            Загрузка...
+        </div>
+
+        <!-- Ошибка -->
+        <div id="error" class="error" style="display: none;">
+            Ошибка загрузки данных
+        </div>
+
+        <!-- Основной контент -->
+        <div id="mainContent" style="display: none;">
+            <!-- Заголовок -->
+            <div class="account-header">
+                <h1>Личный кабинет</h1>
+                <p id="roleDescription"></p>
+            </div>
+
+            <!-- Сообщения -->
+            <div id="message" class="message"></div>
+
+            <!-- Профиль пользователя -->
+            <div class="profile-card">
+                <div class="profile-header">
+                    <h2>Профиль пользователя <span id="roleBadge" class="role-badge"></span></h2>
+                </div>
+                <div class="profile-info">
+                    <div class="info-row">
+                        <span class="info-label">Имя:</span>
+                        <span id="firstName" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Фамилия:</span>
+                        <span id="lastName" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Email:</span>
+                        <span id="email" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Телефон:</span>
+                        <span id="phone" class="info-value"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- UI для Customer -->
+            <div id="customerUI" class="customer-ui">
+                <div class="account-actions">
+                    <a href="@Url.Action("Corzina")" class="action-card">
+                        <div class="action-text">
+                            <h3>🛒 Корзина</h3>
+                            <p>Просмотр и управление корзиной</p>
+                        </div>
+                    </a>
+
+                    <a href="@Url.Action("Edit")" class="action-card">
+                        <div class="action-text">
+                            <h3>✏️ Редактировать профиль</h3>
+                            <p>Изменение личных данных</p>
+                        </div>
+                    </a>
+
+                    <a href="@Url.Action("Orders")" class="action-card">
+                        <div class="action-text">
+                            <h3>📦 Мои заказы</h3>
+                            <p>История ваших покупок</p>
+                        </div>
+                    </a>
+
+                    <button id="logoutBtn" class="action-card" style="cursor: pointer; border: none; background: white; width: 100%; text-align: left;">
+                        <div class="action-text">
+                            <h3>🚪 Выйти</h3>
+                            <p>Завершение текущей сессии</p>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- UI для Admin -->
+            <div id="adminUI" class="admin-ui">
+                <h2 class="admin-title">👑 Панель администратора</h2>
+
+                <div class="admin-actions">
+                    <div class="admin-card" onclick="manageTovars()">
+                        <h3>📦 Управление товарами</h3>
+                        <p>Добавление, редактирование и удаление товаров</p>
+                    </div>
+                </div>
+
+                <!-- Блок управления товарами -->
+                <div id="tovarManagement" style="display: none; margin-top: 30px;">
+                    <div class="section-header">
+                        <h3>📦 Управление товарами</h3>
+                        <button class="btn btn-success" onclick="showAddTovarForm()">+ Добавить товар</button>
+                    </div>
+
+                    <!-- Форма добавления товара -->
+                    <div id="addTovarForm" style="display: none; background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                        <h4>Добавить новый товар</h4>
+                        <form id="tovarForm">
+                            <div style="margin-bottom: 15px;">
+                                <label>Название товара:</label>
+                                <input type="text" id="tovarTitle" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" required>
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <label>Цена:</label>
+                                <input type="number" id="tovarPrice" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" step="0.01" required>
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <label>Количество:</label>
+                                <input type="number" id="tovarCount" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" required>
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <label>Описание:</label>
+                                <textarea id="tovarDescription" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; height: 80px;"></textarea>
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <label>Теги (через запятую):</label>
+                                <input type="text" id="tovarTags" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" placeholder="новинка, популярный, скидка">
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-success">Сохранить</button>
+                                <button type="button" class="btn btn-primary" onclick="hideAddTovarForm()">Отмена</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Список товаров -->
+                    <div id="tovarsList">
+                        <div class="loading">Загрузка товаров...</div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <button id="adminLogoutBtn" class="btn btn-danger">🚪 Выйти из системы</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно редактирования товара -->
+    <div id="editTovarModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditModal()">&times;</span>
+            <h2>Редактировать товар</h2>
+            <form id="editTovarForm">
+                <input type="hidden" id="editTovarId">
+
+                <div class="form-group">
+                    <label class="form-label">Название товара:</label>
+                    <input type="text" id="editTovarTitle" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Цена:</label>
+                    <input type="number" id="editTovarPrice" class="form-input" step="0.01" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Количество:</label>
+                    <input type="number" id="editTovarCount" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Описание:</label>
+                    <textarea id="editTovarDescription" class="form-textarea"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Теги (через запятую):</label>
+                    <input type="text" id="editTovarTags" class="form-input" placeholder="новинка, популярный, скидка">
+                </div>
+
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-primary" onclick="closeEditModal()">Отмена</button>
+                    <button type="submit" class="btn btn-success">Сохранить изменения</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let allTovars = [];
+
+        document.addEventListener('DOMContentLoaded', function () {
+            loadUserData();
+
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+            document.getElementById('adminLogoutBtn').addEventListener('click', logout);
+
+            document.getElementById('tovarForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                addNewTovar();
+            });
+
+            document.getElementById('editTovarForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                saveTovarChanges();
+            });
+
+            // Закрытие модального окна при клике вне его
+            window.addEventListener('click', function (event) {
+                const modal = document.getElementById('editTovarModal');
+                if (event.target === modal) {
+                    closeEditModal();
+                }
+            });
+        });
+
+        function loadUserData() {
+            const accessToken = localStorage.getItem('accessToken');
+
+            if (!accessToken) {
+                window.location.href = '/SignIn';
+                return;
+            }
+
+            showLoading();
+
+            fetch('https://localhost:7276/api/Account/validate', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("User data from server:", data);
+
+                    if (data.authenticated) {
+                        currentUser = data.user;
+                        displayUserInterface(data.user);
+                    } else {
+                        window.location.href = '/SignIn';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading user data:', error);
+                    showError();
+                });
+        }
+
+        function displayUserInterface(user) {
+            hideLoading();
+
+            // Заполняем данные профиля
+            document.getElementById('firstName').textContent = user.firstName || 'Не указано';
+            document.getElementById('lastName').textContent = user.lastName || 'Не указано';
+            document.getElementById('email').textContent = user.email;
+            document.getElementById('phone').textContent = user.phone || 'Не указано';
+
+            // Настраиваем интерфейс в зависимости от роли
+            if (user.role === 'admin') {
+                setupAdminInterface(user);
+            } else {
+                setupCustomerInterface(user);
+            }
+
+            // Показываем основной контент
+            document.getElementById('mainContent').style.display = 'block';
+        }
+
+        function setupCustomerInterface(user) {
+            document.getElementById('roleDescription').textContent = 'Управление вашими данными и заказами';
+            document.getElementById('roleBadge').textContent = 'ПОКУПАТЕЛЬ';
+            document.getElementById('roleBadge').className = 'role-badge role-customer';
+
+            document.getElementById('customerUI').style.display = 'block';
+            document.getElementById('adminUI').style.display = 'none';
+        }
+
+        function setupAdminInterface(user) {
+            document.getElementById('roleDescription').textContent = 'Панель управления магазином';
+            document.getElementById('roleBadge').textContent = 'АДМИНИСТРАТОР';
+            document.getElementById('roleBadge').className = 'role-badge role-admin';
+
+            document.getElementById('customerUI').style.display = 'none';
+            document.getElementById('adminUI').style.display = 'block';
+        }
+
+        function manageTovars() {
+            document.getElementById('tovarManagement').style.display = 'block';
+            loadTovars();
+        }
+
+        function showAddTovarForm() {
+            document.getElementById('addTovarForm').style.display = 'block';
+        }
+
+        function hideAddTovarForm() {
+            document.getElementById('addTovarForm').style.display = 'none';
+            document.getElementById('tovarForm').reset();
+        }
+
+        function loadTovars() {
+            const accessToken = localStorage.getItem('accessToken');
+            const tovarsList = document.getElementById('tovarsList');
+
+            tovarsList.innerHTML = '<div class="loading">Загрузка товаров...</div>';
+
+            fetch('https://localhost:7276/api/Tovars', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load tovars');
+                    }
+                    return response.json();
+                })
+                .then(tovars => {
+                    allTovars = tovars;
+                    displayTovars(tovars);
+                })
+                .catch(error => {
+                    console.error('Error loading tovars:', error);
+                    tovarsList.innerHTML = '<div class="error">Ошибка загрузки товаров</div>';
+                });
+        }
+
+        function displayTovars(tovars) {
+            const tovarsList = document.getElementById('tovarsList');
+
+            if (!tovars || tovars.length === 0) {
+                tovarsList.innerHTML = '<div class="loading">Товары не найдены</div>';
+                return;
+            }
+
+            tovarsList.innerHTML = tovars.map(tovar => `
+                    <div class="tovar-card">
+                        <div class="tovar-header">
+                            <div style="flex: 1;">
+                                <h3 class="tovar-title">${tovar.title}</h3>
+                                <div class="tovar-price">$${tovar.price}</div>
+                                <div class="tovar-count">В наличии: ${tovar.count} шт.</div>
+                            </div>
+                        </div>
+
+                        ${tovar.description ? `<div class="tovar-description">${tovar.description}</div>` : ''}
+
+                        ${tovar.tag ? `
+                            <div class="tovar-tags">
+                                ${tovar.tag.split(',').map(tag => `<span class="tag">${tag.trim()}</span>`).join('')}
+                            </div>
+                        ` : ''}
+
+                        <div class="tovar-actions">
+                            <button class="btn btn-primary" onclick="editTovar(${tovar.id})">✏️ Редактировать</button>
+                            <button class="btn btn-danger" onclick="deleteTovar(${tovar.id})">🗑️ Удалить</button>
+                        </div>
+                    </div>
+                `).join('');
+        }
+
+        function addNewTovar() {
+            const accessToken = localStorage.getItem('accessToken');
+            const tovarData = {
+                title: document.getElementById('tovarTitle').value,
+                price: parseFloat(document.getElementById('tovarPrice').value),
+                count: parseInt(document.getElementById('tovarCount').value),
+                description: document.getElementById('tovarDescription').value,
+                tag: document.getElementById('tovarTags').value,
+                image: ""
+            };
+
+            fetch('https://localhost:7276/api/Tovars', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(tovarData)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to add tovar');
+                    }
+                    return response.json();
+                })
+                .then(newTovar => {
+                    showMessage('Товар успешно добавлен!', 'success');
+                    hideAddTovarForm();
+                    loadTovars();
+                })
+                .catch(error => {
+                    console.error('Error adding tovar:', error);
+                    showMessage('Ошибка при добавлении товара', 'error');
+                });
+        }
+
+        function editTovar(tovarId) {
+            const tovar = allTovars.find(t => t.id === tovarId);
+            if (!tovar) {
+                showMessage('Товар не найден', 'error');
+                return;
+            }
+
+            // Заполняем форму данными товара
+            document.getElementById('editTovarId').value = tovar.id;
+            document.getElementById('editTovarTitle').value = tovar.title;
+            document.getElementById('editTovarPrice').value = tovar.price;
+            document.getElementById('editTovarCount').value = tovar.count;
+            document.getElementById('editTovarDescription').value = tovar.description || '';
+            document.getElementById('editTovarTags').value = tovar.tag || '';
+
+            // Показываем модальное окно
+            document.getElementById('editTovarModal').style.display = 'block';
+        }
+
+        function saveTovarChanges() {
+            const accessToken = localStorage.getItem('accessToken');
+            const tovarId = document.getElementById('editTovarId').value;
+
+            const tovarData = {
+                title: document.getElementById('editTovarTitle').value,
+                price: parseFloat(document.getElementById('editTovarPrice').value),
+                count: parseInt(document.getElementById('editTovarCount').value),
+                description: document.getElementById('editTovarDescription').value,
+                tag: document.getElementById('editTovarTags').value,
+                image: ""
+            };
+
+            fetch(`https://localhost:7276/api/Tovars/${tovarId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(tovarData)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to update tovar');
+                    }
+                    return response.json();
+                })
+                .then(updatedTovar => {
+                    showMessage('Товар успешно обновлен!', 'success');
+                    closeEditModal();
+                    loadTovars();
+                })
+                .catch(error => {
+                    console.error('Error updating tovar:', error);
+                    showMessage('Ошибка при обновлении товара', 'error');
+                });
+        }
+
+        function closeEditModal() {
+            document.getElementById('editTovarModal').style.display = 'none';
+            document.getElementById('editTovarForm').reset();
+        }
+
+        function deleteTovar(tovarId) {
+            const accessToken = localStorage.getItem('accessToken');
+
+            if (confirm('Вы уверены, что хотите удалить этот товар?')) {
+                fetch(`https://localhost:7276/api/Tovars/${tovarId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': 'Bearer ' + accessToken
+                    }
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            showMessage('Товар успешно удален!', 'success');
+                            loadTovars();
+                        } else {
+                            throw new Error('Failed to delete tovar');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error deleting tovar:', error);
+                        showMessage('Ошибка при удалении товара', 'error');
+                    });
+            }
+        }
+
+        function logout() {
+            const accessToken = localStorage.getItem('accessToken');
+
+            fetch('https://localhost:7276/api/Account/logout', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken,
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    localStorage.removeItem('accessToken');
+                    window.location.href = data.redirectUrl || '/SignIn';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    localStorage.removeItem('accessToken');
+                    window.location.href = '/SignIn';
+                });
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'none';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function showError() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('mainContent').style.display = 'none';
+        }
+
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = message;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
