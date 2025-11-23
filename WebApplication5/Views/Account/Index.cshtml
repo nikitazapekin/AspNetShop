@@ -298,6 +298,66 @@
             align-items: center;
             margin-bottom: 20px;
         }
+
+        /* Стили для изображений товаров */
+        .tovar-image {
+            max-width: 100px;
+            max-height: 80px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            object-fit: cover;
+        }
+
+        .tovar-image-preview {
+            max-width: 200px;
+            max-height: 150px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .form-input-file {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+        }
+
+        .image-preview-container {
+            margin-top: 10px;
+        }
+
+        .image-preview {
+            max-width: 200px;
+            max-height: 150px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            display: none;
+        }
+
+        .profile-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .info-value {
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -365,8 +425,6 @@
                         </div>
                     </a>
 
-                  
-
                     <button id="logoutBtn" class="action-card" style="cursor: pointer; border: none; background: white; width: 100%; text-align: left;">
                         <div class="action-text">
                             <h3>🚪 Выйти</h3>
@@ -417,6 +475,14 @@
                             <div style="margin-bottom: 15px;">
                                 <label>Теги (через запятую):</label>
                                 <input type="text" id="tovarTags" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" placeholder="новинка, популярный, скидка">
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <label>Изображение товара:</label>
+                                <input type="file" id="tovarImage" accept="image/*" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                <small style="color: #666;">Выберите изображение для товара (JPG, PNG, GIF)</small>
+                                <div class="image-preview-container">
+                                    <img id="tovarImagePreview" class="image-preview" alt="Предпросмотр изображения">
+                                </div>
                             </div>
                             <div>
                                 <button type="submit" class="btn btn-success">Сохранить</button>
@@ -471,6 +537,16 @@
                     <input type="text" id="editTovarTags" class="form-input" placeholder="новинка, популярный, скидка">
                 </div>
 
+                <div class="form-group">
+                    <label class="form-label">Изображение товара:</label>
+                    <input type="file" id="editTovarImage" class="form-input" accept="image/*">
+                    <small style="color: #666;">Оставьте пустым, чтобы не изменять текущее изображение</small>
+                    <div id="currentImage" style="margin-top: 10px;"></div>
+                    <div class="image-preview-container">
+                        <img id="editTovarImagePreview" class="image-preview" alt="Предпросмотр нового изображения">
+                    </div>
+                </div>
+
                 <div class="modal-buttons">
                     <button type="button" class="btn btn-primary" onclick="closeEditModal()">Отмена</button>
                     <button type="submit" class="btn btn-success">Сохранить изменения</button>
@@ -499,6 +575,15 @@
                 saveTovarChanges();
             });
 
+            // Обработчики для предпросмотра изображений
+            document.getElementById('tovarImage').addEventListener('change', function (e) {
+                previewImage(e.target, 'tovarImagePreview');
+            });
+
+            document.getElementById('editTovarImage').addEventListener('change', function (e) {
+                previewImage(e.target, 'editTovarImagePreview');
+            });
+
             // Закрытие модального окна при клике вне его
             window.addEventListener('click', function (event) {
                 const modal = document.getElementById('editTovarModal');
@@ -507,6 +592,32 @@
                 }
             });
         });
+
+        // Функция для предпросмотра изображения
+        function previewImage(input, previewId) {
+            const file = input.files[0];
+            const preview = document.getElementById(previewId);
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+
+        // Функция для преобразования изображения в base64
+        function convertImageToBase64(file, callback) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                callback(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
 
         function loadUserData() {
             const accessToken = localStorage.getItem('accessToken');
@@ -596,6 +707,7 @@
         function hideAddTovarForm() {
             document.getElementById('addTovarForm').style.display = 'none';
             document.getElementById('tovarForm').reset();
+            document.getElementById('tovarImagePreview').style.display = 'none';
         }
 
         function loadTovars() {
@@ -642,6 +754,11 @@
                                 <div class="tovar-price">$${tovar.price}</div>
                                 <div class="tovar-count">В наличии: ${tovar.count} шт.</div>
                             </div>
+                            ${tovar.image ? `
+                                <div style="margin-left: 20px;">
+                                    <img src="${tovar.image}" class="tovar-image" alt="${tovar.title}">
+                                </div>
+                            ` : ''}
                         </div>
 
                         ${tovar.description ? `<div class="tovar-description">${tovar.description}</div>` : ''}
@@ -662,38 +779,63 @@
 
         function addNewTovar() {
             const accessToken = localStorage.getItem('accessToken');
-            const tovarData = {
-                title: document.getElementById('tovarTitle').value,
-                price: parseFloat(document.getElementById('tovarPrice').value),
-                count: parseInt(document.getElementById('tovarCount').value),
-                description: document.getElementById('tovarDescription').value,
-                tag: document.getElementById('tovarTags').value,
-                image: ""
-            };
+            const imageFile = document.getElementById('tovarImage').files[0];
 
-            fetch('https://localhost:7276/api/Tovars', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + accessToken,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(tovarData)
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to add tovar');
-                    }
-                    return response.json();
+            // Валидация формы
+            const title = document.getElementById('tovarTitle').value.trim();
+            const price = document.getElementById('tovarPrice').value;
+            const count = document.getElementById('tovarCount').value;
+
+            if (!title || !price || !count) {
+                showMessage('Пожалуйста, заполните все обязательные поля', 'error');
+                return;
+            }
+
+            // Если файл не выбран, используем пустую строку
+            if (!imageFile) {
+                saveTovarWithImage("");
+                return;
+            }
+
+            // Конвертируем изображение в base64
+            convertImageToBase64(imageFile, function (base64Image) {
+                saveTovarWithImage(base64Image);
+            });
+
+            function saveTovarWithImage(imageData) {
+                const tovarData = {
+                    title: title,
+                    price: parseFloat(price),
+                    count: parseInt(count),
+                    description: document.getElementById('tovarDescription').value,
+                    tag: document.getElementById('tovarTags').value,
+                    image: imageData
+                };
+
+                fetch('https://localhost:7276/api/Tovars', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + accessToken,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(tovarData)
                 })
-                .then(newTovar => {
-                    showMessage('Товар успешно добавлен!', 'success');
-                    hideAddTovarForm();
-                    loadTovars();
-                })
-                .catch(error => {
-                    console.error('Error adding tovar:', error);
-                    showMessage('Ошибка при добавлении товара', 'error');
-                });
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to add tovar');
+                        }
+                        return response.json();
+                    })
+                    .then(newTovar => {
+                        showMessage('Товар успешно добавлен!', 'success');
+                        hideAddTovarForm();
+                        loadTovars();
+                    })
+                    .catch(error => {
+                        console.error('Error adding tovar:', error);
+                        showMessage('Ошибка при добавлении товара', 'error');
+                    });
+            }
         }
 
         function editTovar(tovarId) {
@@ -711,6 +853,21 @@
             document.getElementById('editTovarDescription').value = tovar.description || '';
             document.getElementById('editTovarTags').value = tovar.tag || '';
 
+            // Показываем текущее изображение если есть
+            const currentImageDiv = document.getElementById('currentImage');
+            if (tovar.image) {
+                currentImageDiv.innerHTML = `
+                        <strong>Текущее изображение:</strong><br>
+                        <img src="${tovar.image}" class="tovar-image-preview" alt="Текущее изображение">
+                    `;
+            } else {
+                currentImageDiv.innerHTML = '<em>Изображение не установлено</em>';
+            }
+
+            // Сбрасываем поле файла и скрываем предпросмотр
+            document.getElementById('editTovarImage').value = '';
+            document.getElementById('editTovarImagePreview').style.display = 'none';
+
             // Показываем модальное окно
             document.getElementById('editTovarModal').style.display = 'block';
         }
@@ -718,44 +875,70 @@
         function saveTovarChanges() {
             const accessToken = localStorage.getItem('accessToken');
             const tovarId = document.getElementById('editTovarId').value;
+            const imageFile = document.getElementById('editTovarImage').files[0];
 
-            const tovarData = {
-                title: document.getElementById('editTovarTitle').value,
-                price: parseFloat(document.getElementById('editTovarPrice').value),
-                count: parseInt(document.getElementById('editTovarCount').value),
-                description: document.getElementById('editTovarDescription').value,
-                tag: document.getElementById('editTovarTags').value,
-                image: ""
-            };
+            // Валидация формы
+            const title = document.getElementById('editTovarTitle').value.trim();
+            const price = document.getElementById('editTovarPrice').value;
+            const count = document.getElementById('editTovarCount').value;
 
-            fetch(`https://localhost:7276/api/Tovars/${tovarId}`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': 'Bearer ' + accessToken,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(tovarData)
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to update tovar');
-                    }
-                    return response.json();
-                })
-                .then(updatedTovar => {
-                    showMessage('Товар успешно обновлен!', 'success');
-                    closeEditModal();
-                    loadTovars();
-                })
-                .catch(error => {
-                    console.error('Error updating tovar:', error);
-                    showMessage('Ошибка при обновлении товара', 'error');
+            if (!title || !price || !count) {
+                showMessage('Пожалуйста, заполните все обязательные поля', 'error');
+                return;
+            }
+
+            // Если выбран новый файл, конвертируем его
+            if (imageFile) {
+                convertImageToBase64(imageFile, function (base64Image) {
+                    saveTovarChangesWithImage(base64Image);
                 });
+            } else {
+                // Если файл не выбран, используем текущее изображение
+                const currentTovar = allTovars.find(t => t.id == tovarId);
+                saveTovarChangesWithImage(currentTovar ? currentTovar.image : "");
+            }
+
+            function saveTovarChangesWithImage(imageData) {
+                const tovarData = {
+                    title: title,
+                    price: parseFloat(price),
+                    count: parseInt(count),
+                    description: document.getElementById('editTovarDescription').value,
+                    tag: document.getElementById('editTovarTags').value,
+                    image: imageData
+                };
+
+                fetch(`https://localhost:7276/api/Tovars/${tovarId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'Bearer ' + accessToken,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(tovarData)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to update tovar');
+                        }
+                        return response.json();
+                    })
+                    .then(updatedTovar => {
+                        showMessage('Товар успешно обновлен!', 'success');
+                        closeEditModal();
+                        loadTovars();
+                    })
+                    .catch(error => {
+                        console.error('Error updating tovar:', error);
+                        showMessage('Ошибка при обновлении товара', 'error');
+                    });
+            }
         }
 
         function closeEditModal() {
             document.getElementById('editTovarModal').style.display = 'none';
             document.getElementById('editTovarForm').reset();
+            document.getElementById('currentImage').innerHTML = '';
+            document.getElementById('editTovarImagePreview').style.display = 'none';
         }
 
         function deleteTovar(tovarId) {
