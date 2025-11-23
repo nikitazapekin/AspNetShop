@@ -9,18 +9,81 @@
     <p>Широкий выбор качественных удочек для профессиональной и любительской рыбалки</p>
 </div>
 
+<!-- Поисковая строка -->
+<div class="search-container">
+    <div class="search-box">
+        <input type="text"
+               id="searchInput"
+               placeholder="Поиск удочек по названию..."
+               class="search-input" />
+        <div class="search-icon">🔍</div>
+    </div>
+    <div class="search-info" id="searchInfo"></div>
+</div>
+
 <div id="productsContainer" class="products-grid">
     <!-- Товары будут загружены через JavaScript -->
     <div class="loading">Загрузка товаров...</div>
 </div>
 
 <script>
+    // Переменные для управления поиском
+    let searchTimeout;
+    let currentSearchQuery = '';
+
     document.addEventListener('DOMContentLoaded', function () {
         loadProducts();
+        setupSearch();
     });
 
-    function loadProducts() {
-        fetch('https://localhost:7276/api/Tovars')
+    function setupSearch() {
+        const searchInput = document.getElementById('searchInput');
+
+        searchInput.addEventListener('input', function (e) {
+            const query = e.target.value.trim();
+            currentSearchQuery = query;
+
+            // Очищаем предыдущий таймер
+            clearTimeout(searchTimeout);
+
+            // Показываем информацию о поиске
+            const searchInfo = document.getElementById('searchInfo');
+            if (query) {
+                searchInfo.textContent = `Поиск: "${query}"`;
+                searchInfo.style.display = 'block';
+            } else {
+                searchInfo.style.display = 'none';
+            }
+
+            // Устанавливаем новый таймер с дебаунсом 500ms
+            searchTimeout = setTimeout(() => {
+                loadProducts(query);
+            }, 500);
+        });
+
+        // Обработчик очистки поиска
+        searchInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                e.target.value = '';
+                currentSearchQuery = '';
+                document.getElementById('searchInfo').style.display = 'none';
+                loadProducts();
+            }
+        });
+    }
+
+    function loadProducts(searchQuery = '') {
+        // Показываем индикатор загрузки
+        const container = document.getElementById('productsContainer');
+        container.innerHTML = '<div class="loading">Загрузка товаров...</div>';
+
+        // Формируем URL с query параметром
+        let url = 'https://localhost:7276/api/Tovars';
+        if (searchQuery) {
+            url += `?search=${encodeURIComponent(searchQuery)}`;
+        }
+
+        fetch(url)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -29,20 +92,30 @@
             })
             .then(tovars => {
                 console.log('Received products:', tovars);
-                displayProducts(tovars);
+                displayProducts(tovars, searchQuery);
             })
             .catch(error => {
                 console.error('Error loading products:', error);
-                document.getElementById('productsContainer').innerHTML =
+                container.innerHTML =
                     '<div class="error">Ошибка загрузки товаров: ' + error.message + '</div>';
             });
     }
 
-    function displayProducts(tovars) {
+    function displayProducts(tovars, searchQuery = '') {
         const container = document.getElementById('productsContainer');
 
         if (!tovars || tovars.length === 0) {
-            container.innerHTML = '<div class="no-products">Товары не найдены</div>';
+            if (searchQuery) {
+                container.innerHTML = `
+                    <div class="no-products">
+                        <h3>По запросу "${searchQuery}" ничего не найдено</h3>
+                        <p>Попробуйте изменить поисковый запрос</p>
+                        <button class="btn-clear-search" onclick="clearSearch()">Показать все товары</button>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = '<div class="no-products">Товары не найдены</div>';
+            }
             return;
         }
 
@@ -71,7 +144,20 @@
             </div>
         `).join('');
 
-        container.innerHTML = productsHTML;
+        // Добавляем информацию о количестве найденных товаров
+        const resultsInfo = searchQuery ?
+            `<div class="search-results-info">Найдено товаров: ${tovars.length}</div>` :
+            '';
+
+        container.innerHTML = resultsInfo + productsHTML;
+    }
+
+    function clearSearch() {
+        const searchInput = document.getElementById('searchInput');
+        searchInput.value = '';
+        currentSearchQuery = '';
+        document.getElementById('searchInfo').style.display = 'none';
+        loadProducts();
     }
 </script>
 
@@ -95,6 +181,66 @@
             margin: 0 auto;
         }
 
+    .search-container {
+        max-width: 600px;
+        margin: 0 auto 40px auto;
+        padding: 0 20px;
+    }
+
+    .search-box {
+        position: relative;
+        margin-bottom: 10px;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 15px 50px 15px 20px;
+        border: 2px solid #e9ecef;
+        border-radius: 30px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .search-input::placeholder {
+            color: #999;
+        }
+
+    .search-icon {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 18px;
+        color: #666;
+        pointer-events: none;
+    }
+
+    .search-info {
+        text-align: center;
+        color: #666;
+        font-size: 14px;
+        margin-top: 10px;
+        display: none;
+    }
+
+    .search-results-info {
+        grid-column: 1 / -1;
+        text-align: center;
+        color: #666;
+        font-size: 16px;
+        margin-bottom: 20px;
+        padding: 10px;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+
     .loading, .error, .no-products {
         text-align: center;
         padding: 40px;
@@ -108,6 +254,35 @@
         background: #f8d7da;
         border-radius: 8px;
     }
+
+    .no-products {
+        padding: 60px 20px;
+    }
+
+        .no-products h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .no-products p {
+            margin-bottom: 20px;
+            color: #666;
+        }
+
+    .btn-clear-search {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.3s;
+    }
+
+        .btn-clear-search:hover {
+            background: #0056b3;
+        }
 
     .products-grid {
         display: grid;
@@ -221,4 +396,6 @@
     .out-of-stock-text {
         color: #dc3545;
     }
+
+   
 </style>
