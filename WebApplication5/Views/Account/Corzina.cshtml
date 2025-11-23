@@ -1,5 +1,4 @@
-﻿@model List<WebApplication5.Models.CartItem>
-@{
+﻿@{
     ViewBag.Title = "Корзина";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -10,149 +9,224 @@
         <p>Товары, которые вы планируете приобрести</p>
     </div>
 
-    @if (Model == null || !Model.Any())
-    {
-        <div class="empty-cart">
-
-            <h2>Корзина пуста</h2>
-            <p>Добавьте товары из каталога</p>
-            <a href="@Url.Action("Index", "Products")" class="btn-primary">Перейти к покупкам</a>
-        </div>
-    }
-    else
-    {
-        <div class="cart-content">
-            <div class="cart-items">
-                @foreach (var item in Model)
-                {
-                    <div class="cart-item" data-product-id="@item.ProductId">
-                        <div class="item-image">
-                            <img src="@item.ImageUrl" alt="@item.ProductName" />
-                        </div>
-                        <div class="item-details">
-                            <h3 class="item-name">@item.ProductName</h3>
-                            <div class="item-price">@item.Price.ToString("N0") руб</div>
-                        </div>
-                        <div class="item-quantity">
-                            <button class="quantity-btn minus-btn" onclick="updateQuantity(@item.ProductId, -1)">-</button>
-                            <input type="number" class="quantity-input" value="@item.Quantity" min="1"
-                                   onchange="updateQuantityInput(@item.ProductId, this.value)" />
-                            <button class="quantity-btn plus-btn" onclick="updateQuantity(@item.ProductId, 1)">+</button>
-                        </div>
-                        <div class="item-total">
-                            <span class="total-price">@item.TotalPrice.ToString("N0") руб</span>
-                        </div>
-                     
-                    </div>
-                }
-            </div>
-
-            <div class="cart-summary">
-                <div class="summary-card">
-                    <h3>Итого</h3>
-                    <div class="summary-row">
-                        <span>Товары (@Model.Sum(i => i.Quantity) шт.):</span>
-                        <span>@Model.Sum(i => i.TotalPrice).ToString("N0") руб </span>
-                    </div>
-                    <div class="summary-row">
-                        <span>Доставка:</span>
-                        <span>Бесплатно</span>
-                    </div>
-                    <div class="summary-total">
-                        <span>Общая сумма:</span>
-                        <span class="total-amount">@Model.Sum(i => i.TotalPrice).ToString("N0") руб</span>
-                    </div>
-                    <button class="btn-checkout">Оформить заказ</button>
-                    <a href="@Url.Action("Index", "Products")" class="btn-continue">Продолжить покупки</a>
-                </div>
-            </div>
-        </div>
-    }
+    <div id="cartContent">
+        <div class="loading">Загрузка корзины...</div>
+    </div>
 </div>
 
-
 <script>
-    function updateQuantity(productId, change) {
-        const input = document.querySelector(`.cart-item[data-product-id="${productId}"] .quantity-input`);
+    document.addEventListener('DOMContentLoaded', function () {
+        loadCart();
+    });
+
+    function loadCart() {
+        const accessToken = localStorage.getItem('accessToken');
+
+        if (!accessToken) {
+            showEmptyCart('Для просмотра корзины необходимо авторизоваться');
+            return;
+        }
+
+        fetch('https://localhost:7276/api/Cart/items', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + accessToken,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        throw new Error('Неавторизованный доступ');
+                    }
+                    throw new Error('Ошибка загрузки корзины');
+                }
+                return response.json();
+            })
+            .then(cartItems => {
+                console.log('Received cart items:', cartItems);
+                displayCart(cartItems);
+            })
+            .catch(error => {
+                console.error('Error loading cart:', error);
+                if (error.message === 'Неавторизованный доступ') {
+                    showEmptyCart('Для просмотра корзины необходимо авторизоваться');
+                } else {
+                    showEmptyCart('Ошибка загрузки корзины: ' + error.message);
+                }
+            });
+    }
+
+    function displayCart(cartItems) {
+        const cartContent = document.getElementById('cartContent');
+
+        if (!cartItems || cartItems.length === 0) {
+            showEmptyCart('Корзина пуста');
+            return;
+        }
+
+        // Рассчитываем общие суммы
+        const totalQuantity = cartItems.reduce((sum, item) => sum + item.count, 0);
+        const totalPrice = cartItems.reduce((sum, item) => sum + item.sum, 0);
+
+        const cartHTML = `
+            <div class="cart-content">
+                <div class="cart-items">
+                    ${cartItems.map(item => `
+                        <div class="cart-item" data-purchase-id="${item.id}">
+                            <div class="item-image">
+                                <img src="${item.tovar?.image || 'https://via.placeholder.com/80x80?text=No+Image'}"
+                                     alt="${item.tovar?.title || 'Товар'}"
+                                     onerror="this.src='https://via.placeholder.com/80x80?text=No+Image'" />
+                            </div>
+                            <div class="item-details">
+                                <h3 class="item-name">${item.tovar?.title || 'Название не указано'}</h3>
+                                <div class="item-price">${item.tovar ? parseInt(item.tovar.price).toLocaleString('ru-RU') : '0'} руб</div>
+                            </div>
+                            <div class="item-quantity">
+                                <button class="quantity-btn minus-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+                                <input type="number" class="quantity-input" value="${item.count}" min="1"
+                                       onchange="updateQuantityInput(${item.id}, this.value)" />
+                                <button class="quantity-btn plus-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+                            </div>
+                            <div class="item-total">
+                                <span class="total-price">${parseInt(item.sum).toLocaleString('ru-RU')} руб</span>
+                            </div>
+                            <button class="remove-btn" onclick="removeFromCart(${item.id})">×</button>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="cart-summary">
+                    <div class="summary-card">
+                        <h3>Итого</h3>
+                        <div class="summary-row">
+                            <span>Товары (${totalQuantity} шт.):</span>
+                            <span>${parseInt(totalPrice).toLocaleString('ru-RU')} руб</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Доставка:</span>
+                            <span>Бесплатно</span>
+                        </div>
+                        <div class="summary-total">
+                            <span>Общая сумма:</span>
+                            <span class="total-amount">${parseInt(totalPrice).toLocaleString('ru-RU')} руб</span>
+                        </div>
+                        <button class="btn-checkout" onclick="checkout()">Оформить заказ</button>
+                        <a href="/Products/Index" class="btn-continue">Продолжить покупки</a>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        cartContent.innerHTML = cartHTML;
+    }
+
+    function showEmptyCart(message) {
+        const cartContent = document.getElementById('cartContent');
+        cartContent.innerHTML = `
+            <div class="empty-cart">
+                <div class="empty-icon">🛒</div>
+                <h2>${message}</h2>
+                <p>${message === 'Корзина пуста' ? 'Добавьте товары из каталога' : ''}</p>
+                <a href="/Products/Index" class="btn-primary">Перейти к покупкам</a>
+            </div>
+        `;
+    }
+
+    function updateQuantity(purchaseId, change) {
+        const input = document.querySelector(`.cart-item[data-purchase-id="${purchaseId}"] .quantity-input`);
         let newQuantity = parseInt(input.value) + change;
 
         if (newQuantity < 1) newQuantity = 1;
 
         input.value = newQuantity;
-        updateCartOnServer(productId, newQuantity);
+        updateCartOnServer(purchaseId, newQuantity);
     }
 
-    function updateQuantityInput(productId, value) {
+    function updateQuantityInput(purchaseId, value) {
         let quantity = parseInt(value);
         if (isNaN(quantity) || quantity < 1) {
             quantity = 1;
         }
 
-        const input = document.querySelector(`.cart-item[data-product-id="${productId}"] .quantity-input`);
+        const input = document.querySelector(`.cart-item[data-purchase-id="${purchaseId}"] .quantity-input`);
         input.value = quantity;
-        updateCartOnServer(productId, quantity);
+        updateCartOnServer(purchaseId, quantity);
     }
-    function updateCartOnServer(productId, quantity) {
-    fetch('https://localhost:44394/account/updatecart', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: JSON.stringify({ productId: productId, quantity: quantity })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            updateCartUI(data);
-         
-            if (data.updatedItem) {
-                updateCartItem(productId, data.updatedItem.totalPrice);
+
+    function updateCartOnServer(purchaseId, quantity) {
+        const accessToken = localStorage.getItem('accessToken');
+
+        fetch(`https://localhost:7276/api/Cart/update/${purchaseId}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': 'Bearer ' + accessToken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(quantity)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка обновления корзины');
+                }
+                return response.json();
+            })
+            .then(updatedItem => {
+                // Обновляем UI
+                updateCartItemUI(purchaseId, updatedItem);
+                // Перезагружаем корзину для обновления итогов
+                loadCart();
+            })
+            .catch(error => {
+                console.error('Error updating cart:', error);
+                alert('Ошибка при обновлении количества: ' + error.message);
+                // Возвращаем предыдущее значение
+                loadCart();
+            });
+    }
+
+    function removeFromCart(purchaseId) {
+        const accessToken = localStorage.getItem('accessToken');
+
+        if (!confirm('Удалить товар из корзины?')) {
+            return;
+        }
+
+        fetch(`https://localhost:7276/api/Cart/remove/${purchaseId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + accessToken
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка удаления товара');
+                }
+                // Перезагружаем корзину
+                loadCart();
+            })
+            .catch(error => {
+                console.error('Error removing from cart:', error);
+                alert('Ошибка при удалении товара: ' + error.message);
+            });
+    }
+
+    function updateCartItemUI(purchaseId, updatedItem) {
+        const cartItem = document.querySelector(`.cart-item[data-purchase-id="${purchaseId}"]`);
+        if (cartItem && updatedItem) {
+            const totalPriceElement = cartItem.querySelector('.total-price');
+            if (totalPriceElement) {
+                totalPriceElement.textContent = parseInt(updatedItem.sum).toLocaleString('ru-RU') + ' руб';
             }
         }
-        return data;
-    })
-   
-    .catch(error => console.error('Error:', error));
-}
+    }
 
-function updateCartUI(data) {
-    
-    const cartTotalElements = document.querySelectorAll('.summary-total .total-amount, .total-amount');
-    cartTotalElements.forEach(element => {
-        element.textContent = data.cartTotal.toLocaleString() + ' руб';
-    });
- 
-    const itemCountElement = document.querySelector('.summary-row span:first-child');
-    if (itemCountElement) {
-        itemCountElement.textContent = `Товары (${data.itemCount} шт.):`;
+    function checkout() {
+        alert('Функция оформления заказа будет реализована позже');
+        // Здесь будет логика оформления заказа
     }
-     
-    const itemsTotalElement = document.querySelector('.summary-row span:last-child');
-    if (itemsTotalElement && data.cartTotal !== undefined) {
-        itemsTotalElement.textContent = data.cartTotal.toLocaleString() + ' руб';
-    }
-     
-    if (data.itemCount === 0) {
-        location.reload();
-    }
-}
-
-function updateCartItem(productId, totalPrice) {
-    const cartItems = document.querySelectorAll('.cart-item');
-    cartItems.forEach(item => {
-        if (item.getAttribute('data-product-id') == productId) {
-            const itemTotalElement = item.querySelector('.total-price');
-            if (itemTotalElement) {
-                itemTotalElement.textContent = totalPrice.toLocaleString() + ' руб';
-            }
-        }
-    });
-}
 </script>
-
-
-
 
 <style>
     .cart-container {
@@ -176,6 +250,13 @@ function updateCartItem(productId, totalPrice) {
             color: #666;
             font-size: 16px;
         }
+
+    .loading {
+        text-align: center;
+        padding: 40px;
+        font-size: 18px;
+        color: #666;
+    }
 
     .empty-cart {
         text-align: center;
@@ -397,5 +478,6 @@ function updateCartItem(productId, totalPrice) {
             color: white;
             text-decoration: none;
         }
-     
+
+  
 </style>
