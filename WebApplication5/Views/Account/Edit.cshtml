@@ -63,8 +63,7 @@
             window.location.href = '/signin';
             return;
         }
-
-        // Загружаем данные профиля
+ 
         loadUserProfile();
     }
 
@@ -85,9 +84,9 @@
                 return response.json();
             })
             .then(data => {
-                console.log('Profile data received:', data); // Для отладки
+                console.log('Profile data received:', data); 
                 if (data.success) {
-                    // Заполняем форму данными пользователя
+              
                     populateForm(data.user);
                 } else {
                     showMessage(data.message || 'Ошибка при загрузке профиля', 'error');
@@ -100,9 +99,8 @@
     }
 
     function populateForm(userData) {
-        console.log('Populating form with:', userData); // Для отладки
-
-        // Используем camelCase, так как API возвращает в camelCase
+        console.log('Populating form with:', userData);  
+ 
         document.getElementById('FirstName').value = userData.firstName || '';
         document.getElementById('LastName').value = userData.lastName || '';
         document.getElementById('Email').value = userData.email || '';
@@ -119,7 +117,7 @@
             Phone: document.getElementById('Phone').value,
         };
 
-        // Используем тот же endpoint что и для получения профиля, но метод POST
+     
         fetch('https://localhost:7276/api/Account/updateprofile', {
             method: 'POST',
             headers: {
@@ -169,7 +167,7 @@
 </script>
 
 <style>
-    /* Ваши существующие стили остаются без изменений */
+   
     .account-container {
         max-width: 1000px;
         margin: 0 auto;

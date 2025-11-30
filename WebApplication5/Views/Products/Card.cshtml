@@ -31,7 +31,7 @@
 </div>
 
 <script>
-    // Глобальная переменная для отслеживания состояния запроса
+  
     let isAddingToCart = false;
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -70,26 +70,22 @@
     }
 
     function displayProduct(product) {
-        // Скрываем сообщение о загрузке
+       
         document.getElementById('loadingMessage').style.display = 'none';
-
-        // Заполняем данные товара
+ 
         document.getElementById('productName').textContent = product.title || 'Название не указано';
         document.getElementById('productCategory').textContent = 'Рыбацкие удочки';
         document.getElementById('productPrice').textContent = (product.price ? parseInt(product.price).toLocaleString('ru-RU') : '0') + ' Руб';
         document.getElementById('productDescription').textContent = product.description || 'Описание отсутствует';
-
-        // Устанавливаем изображение
+ 
         const productImage = document.getElementById('productImage');
         productImage.src = product.image || 'https://via.placeholder.com/500x400?text=No+Image';
         productImage.alt = product.title || 'Товар';
-
-        // Обработка ошибки загрузки изображения
+ 
         productImage.onerror = function () {
             this.src = 'https://via.placeholder.com/500x400?text=No+Image';
         };
-
-        // Отображаем наличие
+ 
         const stockElement = document.getElementById('productStock');
         if (product.count > 0) {
             stockElement.innerHTML = '<span class="in-stock">В наличии: ' + product.count + ' шт.</span>';
@@ -102,10 +98,9 @@
             document.getElementById('addToCartBtn').textContent = 'Нет в наличии';
         }
 
-        // Обновляем title страницы
+     
         document.title = product.title + ' - Рыбацкие удочки';
-
-        // Показываем контент
+ 
         document.getElementById('productContent').style.display = 'grid';
     }
 
@@ -118,11 +113,10 @@
         document.getElementById('errorMessage').style.textAlign = 'center';
         document.getElementById('errorMessage').style.fontSize = '18px';
     }
-
-    // Обработчик добавления в корзину
+     
     document.getElementById('addToCartBtn').addEventListener('click', function () {
         if (isAddingToCart) {
-            return; // Игнорируем повторные нажатия
+            return; 
         }
 
         const productId = getProductIdFromUrl();
@@ -130,7 +124,7 @@
     });
 
     function addToCart(productId) {
-        // Проверяем, не выполняется ли уже запрос
+       
         if (isAddingToCart) {
             return;
         }
@@ -142,11 +136,9 @@
             window.location.href = '/signin';
             return;
         }
-
-        // Устанавливаем флаг выполнения запроса
+ 
         isAddingToCart = true;
-
-        // Показываем индикатор загрузки
+ 
         const addButton = document.getElementById('addToCartBtn');
         const originalText = addButton.textContent;
         addButton.textContent = 'Добавляем...';
@@ -179,27 +171,22 @@
             })
             .then(purchase => {
                 console.log('Товар добавлен в корзину:', purchase);
-
-                // Показываем уведомление об успехе
+ 
                 showSuccessMessage('Товар успешно добавлен в корзину!');
-
-                // Обновляем информацию о наличии
-                updateStockAfterAdd(1); // Всегда добавляем только 1 штуку
-
-                // Блокируем кнопку после успешного добавления
+ 
+                updateStockAfterAdd(1);  
+ 
                 addButton.textContent = 'Добавлено в корзину';
                 addButton.style.backgroundColor = '#28a745';
                 addButton.disabled = true;
-
-                // Устанавливаем таймер для разблокировки кнопки через 3 секунды
+ 
                 setTimeout(() => {
                     resetAddButton();
                 }, 3000);
             })
             .catch(error => {
                 console.error('Error adding to cart:', error);
-
-                // Показываем ошибку
+                 
                 if (error.message.includes('недостаточно') || error.message.includes('не найден')) {
                     showErrorMessage('Не удалось добавить товар в корзину: ' + error.message);
                 } else if (error.message.includes('Неавторизованный')) {
@@ -209,11 +196,11 @@
                     showErrorMessage('Ошибка при добавлении в корзину: ' + error.message);
                 }
 
-                // Восстанавливаем кнопку при ошибке
+            
                 resetAddButton();
             })
             .finally(() => {
-                // Сбрасываем флаг выполнения запроса
+             
                 isAddingToCart = false;
             });
     }
@@ -226,7 +213,7 @@
     }
 
     function updateStockAfterAdd(quantityAdded) {
-        // Обновляем отображение количества на складе
+       
         const stockElement = document.getElementById('productStock');
         const currentStockText = stockElement.textContent;
         const currentStockMatch = currentStockText.match(/В наличии: (\d+) шт\./);
@@ -247,7 +234,7 @@
     }
 
     function showSuccessMessage(message) {
-        // Создаем или находим элемент для уведомления
+        
         let notification = document.getElementById('successNotification');
         if (!notification) {
             notification = document.createElement('div');
@@ -271,14 +258,14 @@
         notification.textContent = message;
         notification.style.display = 'block';
 
-        // Автоматически скрываем через 3 секунды
+        
         setTimeout(() => {
             notification.style.display = 'none';
         }, 3000);
     }
 
     function showErrorMessage(message) {
-        // Создаем или находим элемент для уведомления об ошибке
+       
         let notification = document.getElementById('errorNotification');
         if (!notification) {
             notification = document.createElement('div');
@@ -302,7 +289,7 @@
         notification.textContent = message;
         notification.style.display = 'block';
 
-        // Автоматически скрываем через 5 секунды
+      
         setTimeout(() => {
             notification.style.display = 'none';
         }, 5000);

@@ -8,26 +8,25 @@
     <h1>Рыбацкие удочки</h1>
     <p>Широкий выбор качественных удочек для профессиональной и любительской рыбалки</p>
 </div>
-
-<!-- Поисковая строка -->
+ 
 <div class="search-container">
     <div class="search-box">
         <input type="text"
                id="searchInput"
                placeholder="Поиск удочек по названию..."
                class="search-input" />
-        <div class="search-icon">🔍</div>
+       
     </div>
     <div class="search-info" id="searchInfo"></div>
 </div>
 
 <div id="productsContainer" class="products-grid">
-    <!-- Товары будут загружены через JavaScript -->
+    
     <div class="loading">Загрузка товаров...</div>
 </div>
 
 <script>
-    // Переменные для управления поиском
+  
     let searchTimeout;
     let currentSearchQuery = '';
 
@@ -43,25 +42,26 @@
             const query = e.target.value.trim();
             currentSearchQuery = query;
 
-            // Очищаем предыдущий таймер
+         
             clearTimeout(searchTimeout);
 
-            // Показываем информацию о поиске
+          
             const searchInfo = document.getElementById('searchInfo');
             if (query) {
                 searchInfo.textContent = `Поиск: "${query}"`;
                 searchInfo.style.display = 'block';
+                searchInfo.style.whiteSpace ='nowrap'
             } else {
                 searchInfo.style.display = 'none';
             }
 
-            // Устанавливаем новый таймер с дебаунсом 500ms
+          
             searchTimeout = setTimeout(() => {
                 loadProducts(query);
             }, 500);
         });
 
-        // Обработчик очистки поиска
+       
         searchInput.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {
                 e.target.value = '';
@@ -73,11 +73,11 @@
     }
 
     function loadProducts(searchQuery = '') {
-        // Показываем индикатор загрузки
+      
         const container = document.getElementById('productsContainer');
         container.innerHTML = '<div class="loading">Загрузка товаров...</div>';
 
-        // Формируем URL с query параметром
+       
         let url = 'https://localhost:7276/api/Tovars';
         if (searchQuery) {
             url += `?search=${encodeURIComponent(searchQuery)}`;
@@ -123,7 +123,7 @@
             <div class="product-card" onclick="location.href='/Products/Card/${tovar.id}'">
                 <div class="product-image">
                     <img src="${tovar.image || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="${tovar.title}"
-                         onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'" />
+                       />
                     ${tovar.count > 0 ?
                 '<div class="stock-badge in-stock">В наличии</div>' :
                 '<div class="stock-badge out-of-stock">Нет в наличии</div>'
@@ -144,7 +144,7 @@
             </div>
         `).join('');
 
-        // Добавляем информацию о количестве найденных товаров
+       
         const resultsInfo = searchQuery ?
             `<div class="search-results-info">Найдено товаров: ${tovars.length}</div>` :
             '';
@@ -182,14 +182,19 @@
         }
 
     .search-container {
-        max-width: 600px;
+       width: 600px;
         margin: 0 auto 40px auto;
         padding: 0 20px;
+        display: flex; 
+        justify-content: center;
     }
 
     .search-box {
         position: relative;
         margin-bottom: 10px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
     }
 
     .search-input {
