@@ -21,8 +21,7 @@
             padding: 50px;
             color: #dc3545;
         }
-
-        /* Стили для customer */
+ 
         .customer-ui {
             display: none;
         }
@@ -56,8 +55,7 @@
                 text-decoration: none;
                 color: inherit;
             }
-
-        /* Стили для admin */
+ 
         .admin-ui {
             display: none;
         }
@@ -76,7 +74,7 @@
                 transform: translateY(-2px);
             }
 
-        /* Общие стили */
+   
         .message {
             padding: 12px;
             margin: 10px 0;
@@ -143,8 +141,7 @@
             background: #007bff;
             color: white;
         }
-
-        /* Модальное окно */
+ 
         .modal {
             display: none;
             position: fixed;
@@ -224,8 +221,7 @@
             gap: 10px;
             margin-top: 25px;
         }
-
-        /* Стили для карточек товаров */
+ 
         .tovar-card {
             background: white;
             border: 1px solid #e0e0e0;
@@ -299,7 +295,7 @@
             margin-bottom: 20px;
         }
 
-        /* Стили для изображений товаров */
+     
         .tovar-image {
             max-width: 100px;
             max-height: 80px;
@@ -362,28 +358,26 @@
 </head>
 <body>
     <div class="container">
-        <!-- Загрузка -->
+       
         <div id="loading" class="loading">
             Загрузка...
         </div>
 
-        <!-- Ошибка -->
+      
         <div id="error" class="error" style="display: none;">
             Ошибка загрузки данных
         </div>
-
-        <!-- Основной контент -->
+ 
         <div id="mainContent" style="display: none;">
-            <!-- Заголовок -->
+        
             <div class="account-header">
                 <h1>Личный кабинет</h1>
                 <p id="roleDescription"></p>
             </div>
 
-            <!-- Сообщения -->
+          
             <div id="message" class="message"></div>
-
-            <!-- Профиль пользователя -->
+ 
             <div class="profile-card">
                 <div class="profile-header">
                     <h2>Профиль пользователя <span id="roleBadge" class="role-badge"></span></h2>
@@ -407,52 +401,50 @@
                     </div>
                 </div>
             </div>
-
-            <!-- UI для Customer -->
+             
             <div id="customerUI" class="customer-ui">
                 <div class="account-actions">
                     <a href="@Url.Action("Corzina")" class="action-card">
                         <div class="action-text">
-                            <h3>🛒 Корзина</h3>
+                            <h3> Корзина</h3>
                             <p>Просмотр и управление корзиной</p>
                         </div>
                     </a>
 
                     <a href="@Url.Action("Edit")" class="action-card">
                         <div class="action-text">
-                            <h3>✏️ Редактировать профиль</h3>
+                            <h3> Редактировать профиль</h3>
                             <p>Изменение личных данных</p>
                         </div>
                     </a>
 
                     <button id="logoutBtn" class="action-card" style="cursor: pointer; border: none; background: white; width: 100%; text-align: left;">
                         <div class="action-text">
-                            <h3>🚪 Выйти</h3>
+                            <h3> Выйти</h3>
                             <p>Завершение текущей сессии</p>
                         </div>
                     </button>
                 </div>
             </div>
-
-            <!-- UI для Admin -->
+ 
             <div id="adminUI" class="admin-ui">
-                <h2 class="admin-title">👑 Панель администратора</h2>
+                <h2 class="admin-title"> Панель администратора</h2>
 
                 <div class="admin-actions">
                     <div class="admin-card" onclick="manageTovars()">
-                        <h3>📦 Управление товарами</h3>
+                        <h3> Управление товарами</h3>
                         <p>Добавление, редактирование и удаление товаров</p>
                     </div>
                 </div>
 
-                <!-- Блок управления товарами -->
+              
                 <div id="tovarManagement" style="display: none; margin-top: 30px;">
                     <div class="section-header">
-                        <h3>📦 Управление товарами</h3>
+                        <h3> Управление товарами</h3>
                         <button class="btn btn-success" onclick="showAddTovarForm()">+ Добавить товар</button>
                     </div>
 
-                    <!-- Форма добавления товара -->
+                  
                     <div id="addTovarForm" style="display: none; background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
                         <h4>Добавить новый товар</h4>
                         <form id="tovarForm">
@@ -491,7 +483,6 @@
                         </form>
                     </div>
 
-                    <!-- Список товаров -->
                     <div id="tovarsList">
                         <div class="loading">Загрузка товаров...</div>
                     </div>
@@ -504,7 +495,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно редактирования товара -->
     <div id="editTovarModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeEditModal()">&times;</span>
@@ -575,7 +565,6 @@
                 saveTovarChanges();
             });
 
-            // Обработчики для предпросмотра изображений
             document.getElementById('tovarImage').addEventListener('change', function (e) {
                 previewImage(e.target, 'tovarImagePreview');
             });
@@ -584,7 +573,6 @@
                 previewImage(e.target, 'editTovarImagePreview');
             });
 
-            // Закрытие модального окна при клике вне его
             window.addEventListener('click', function (event) {
                 const modal = document.getElementById('editTovarModal');
                 if (event.target === modal) {
@@ -593,7 +581,6 @@
             });
         });
 
-        // Функция для предпросмотра изображения
         function previewImage(input, previewId) {
             const file = input.files[0];
             const preview = document.getElementById(previewId);
@@ -609,8 +596,7 @@
                 preview.style.display = 'none';
             }
         }
-
-        // Функция для преобразования изображения в base64
+ 
         function convertImageToBase64(file, callback) {
             const reader = new FileReader();
             reader.onload = function (e) {
@@ -659,21 +645,18 @@
 
         function displayUserInterface(user) {
             hideLoading();
-
-            // Заполняем данные профиля
+ 
             document.getElementById('firstName').textContent = user.firstName || 'Не указано';
             document.getElementById('lastName').textContent = user.lastName || 'Не указано';
             document.getElementById('email').textContent = user.email;
             document.getElementById('phone').textContent = user.phone || 'Не указано';
-
-            // Настраиваем интерфейс в зависимости от роли
+             
             if (user.role === 'admin') {
                 setupAdminInterface(user);
             } else {
                 setupCustomerInterface(user);
             }
-
-            // Показываем основной контент
+ 
             document.getElementById('mainContent').style.display = 'block';
         }
 
@@ -780,8 +763,7 @@
         function addNewTovar() {
             const accessToken = localStorage.getItem('accessToken');
             const imageFile = document.getElementById('tovarImage').files[0];
-
-            // Валидация формы
+ 
             const title = document.getElementById('tovarTitle').value.trim();
             const price = document.getElementById('tovarPrice').value;
             const count = document.getElementById('tovarCount').value;
@@ -790,14 +772,12 @@
                 showMessage('Пожалуйста, заполните все обязательные поля', 'error');
                 return;
             }
-
-            // Если файл не выбран, используем пустую строку
+             
             if (!imageFile) {
                 saveTovarWithImage("");
                 return;
             }
-
-            // Конвертируем изображение в base64
+ 
             convertImageToBase64(imageFile, function (base64Image) {
                 saveTovarWithImage(base64Image);
             });
@@ -845,7 +825,7 @@
                 return;
             }
 
-            // Заполняем форму данными товара
+          
             document.getElementById('editTovarId').value = tovar.id;
             document.getElementById('editTovarTitle').value = tovar.title;
             document.getElementById('editTovarPrice').value = tovar.price;
@@ -853,7 +833,7 @@
             document.getElementById('editTovarDescription').value = tovar.description || '';
             document.getElementById('editTovarTags').value = tovar.tag || '';
 
-            // Показываем текущее изображение если есть
+          
             const currentImageDiv = document.getElementById('currentImage');
             if (tovar.image) {
                 currentImageDiv.innerHTML = `
@@ -864,11 +844,11 @@
                 currentImageDiv.innerHTML = '<em>Изображение не установлено</em>';
             }
 
-            // Сбрасываем поле файла и скрываем предпросмотр
+         
             document.getElementById('editTovarImage').value = '';
             document.getElementById('editTovarImagePreview').style.display = 'none';
 
-            // Показываем модальное окно
+           
             document.getElementById('editTovarModal').style.display = 'block';
         }
 
@@ -876,8 +856,7 @@
             const accessToken = localStorage.getItem('accessToken');
             const tovarId = document.getElementById('editTovarId').value;
             const imageFile = document.getElementById('editTovarImage').files[0];
-
-            // Валидация формы
+ 
             const title = document.getElementById('editTovarTitle').value.trim();
             const price = document.getElementById('editTovarPrice').value;
             const count = document.getElementById('editTovarCount').value;
@@ -887,13 +866,13 @@
                 return;
             }
 
-            // Если выбран новый файл, конвертируем его
+            
             if (imageFile) {
                 convertImageToBase64(imageFile, function (base64Image) {
                     saveTovarChangesWithImage(base64Image);
                 });
             } else {
-                // Если файл не выбран, используем текущее изображение
+             
                 const currentTovar = allTovars.find(t => t.id == tovarId);
                 saveTovarChangesWithImage(currentTovar ? currentTovar.image : "");
             }
