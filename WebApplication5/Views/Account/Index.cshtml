@@ -180,8 +180,10 @@
 
         .form-group {
             margin-bottom: 20px;
+            width: 100%; 
+          
         }
-
+       
         .form-label {
             display: block;
             margin-bottom: 8px;
@@ -196,6 +198,7 @@
             border-radius: 6px;
             font-size: 14px;
             box-sizing: border-box;
+            max-width: 100%
         }
 
             .form-input:focus {
@@ -923,7 +926,7 @@
         function deleteTovar(tovarId) {
             const accessToken = localStorage.getItem('accessToken');
 
-            if (confirm('Вы уверены, что хотите удалить этот товар?')) {
+        
                 fetch(`https://localhost:7276/api/Tovars/${tovarId}`, {
                     method: 'DELETE',
                     headers: {
@@ -943,8 +946,7 @@
                         showMessage('Ошибка при удалении товара', 'error');
                     });
             }
-        }
-
+    
         function logout() {
             const accessToken = localStorage.getItem('accessToken');
 
