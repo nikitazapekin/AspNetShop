@@ -13,15 +13,26 @@
         <div class="loading">Загрузка корзины...</div>
     </div>
 </div>
- 
+
+<!-- Модальное окно для ошибки количества -->
+<div id="quantityErrorModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeQuantityErrorModal()">&times;</span>
+        <h2>Ошибка количества</h2>
+        <div id="quantityErrorText"></div>
+        <div class="modal-buttons">
+            <button type="button" class="btn btn-primary" onclick="closeQuantityErrorModal()">OK</button>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно оформления заказа -->
 <div id="checkoutModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeCheckoutModal()">&times;</span>
         <h2>Оформление заказа</h2>
 
-        <div id="orderSummary">
-          
-        </div>
+        <div id="orderSummary"></div>
 
         <form id="checkoutForm">
             <div class="form-group">
@@ -49,11 +60,16 @@
             e.preventDefault();
             submitOrder();
         });
- 
+
         window.addEventListener('click', function (event) {
             const modal = document.getElementById('checkoutModal');
             if (event.target === modal) {
                 closeCheckoutModal();
+            }
+
+            const errorModal = document.getElementById('quantityErrorModal');
+            if (event.target === errorModal) {
+                closeQuantityErrorModal();
             }
         });
     });
@@ -104,7 +120,7 @@
             showEmptyCart('Корзина пуста');
             return;
         }
-     
+
         const totalQuantity = cartItems.reduce((sum, item) => sum + item.count, 0);
         const totalPrice = cartItems.reduce((sum, item) => sum + item.sum, 0);
 
@@ -121,6 +137,7 @@
                             <div class="item-details">
                                 <h3 class="item-name">${item.tovar?.title || 'Название не указано'}</h3>
                                 <div class="item-price">${item.tovar ? parseInt(item.tovar.price).toLocaleString('ru-RU') : '0'} руб</div>
+                                <div class="item-stock">На складе: ${item.tovar?.count || 0} шт.</div>
                             </div>
                             <div class="item-quantity">
                                 <button class="quantity-btn minus-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
@@ -165,7 +182,6 @@
         const cartContent = document.getElementById('cartContent');
         cartContent.innerHTML = `
             <div class="empty-cart">
-              
                 <h2>${message}</h2>
                 <p>${message === 'Корзина пуста' ? 'Добавьте товары из каталога' : ''}</p>
                 <a href="/Products/Index" class="btn-primary">Перейти к покупкам</a>
@@ -207,20 +223,29 @@
         })
             .then(response => {
                 if (!response.ok) {
+                    if (response.status === 400) {
+                        return response.json().then(data => {
+                            throw new Error(data.message || 'Недостаточно товара на складе');
+                        });
+                    }
                     throw new Error('Ошибка обновления корзины');
                 }
                 return response.json();
             })
             .then(updatedItem => {
-         
+                // Обновляем UI
                 updateCartItemUI(purchaseId, updatedItem);
-      
+                // Перезагружаем корзину для обновления всех данных
                 loadCart();
             })
             .catch(error => {
                 console.error('Error updating cart:', error);
-                alert('Ошибка при обновлении количества: ' + error.message);
-              
+                if (error.message.includes('недостаточно') || error.message.includes('Недостаточно')) {
+                    showQuantityErrorModal(error.message);
+                } else {
+                    showQuantityErrorModal('Ошибка при обновлении количества: ' + error.message);
+                }
+                // Перезагружаем корзину для синхронизации
                 loadCart();
             });
     }
@@ -242,12 +267,11 @@
                 if (!response.ok) {
                     throw new Error('Ошибка удаления товара');
                 }
-              
                 loadCart();
             })
             .catch(error => {
                 console.error('Error removing from cart:', error);
-                alert('Ошибка при удалении товара: ' + error.message);
+                showQuantityErrorModal('Ошибка при удалении товара: ' + error.message);
             });
     }
 
@@ -261,17 +285,24 @@
         }
     }
 
+    function showQuantityErrorModal(message) {
+        document.getElementById('quantityErrorText').textContent = message;
+        document.getElementById('quantityErrorModal').style.display = 'block';
+    }
+
+    function closeQuantityErrorModal() {
+        document.getElementById('quantityErrorModal').style.display = 'none';
+    }
+
     function openCheckoutModal() {
         if (!currentCartItems || currentCartItems.length === 0) {
-            alert('Корзина пуста');
+            showQuantityErrorModal('Корзина пуста');
             return;
         }
 
-       
         const totalQuantity = currentCartItems.reduce((sum, item) => sum + item.count, 0);
         const totalPrice = currentCartItems.reduce((sum, item) => sum + item.sum, 0);
 
-        
         const orderSummaryHTML = `
             <div class="order-summary">
                 <h3>Детали заказа:</h3>
@@ -306,15 +337,13 @@
         const accessToken = localStorage.getItem('accessToken');
 
         if (!email) {
-            alert('Пожалуйста, введите email');
+            showQuantityErrorModal('Пожалуйста, введите email');
             return;
         }
 
-       
- 
         const totalQuantity = currentCartItems.reduce((sum, item) => sum + item.count, 0);
         const totalPrice = currentCartItems.reduce((sum, item) => sum + item.sum, 0);
- 
+
         const orderData = {
             email: email,
             items: currentCartItems.map(item => ({
@@ -326,12 +355,12 @@
             totalQuantity: totalQuantity,
             totalAmount: totalPrice
         };
- 
+
         const submitBtn = document.querySelector('#checkoutForm button[type="submit"]');
         const originalText = submitBtn.textContent;
         submitBtn.textContent = 'Отправка...';
         submitBtn.disabled = true;
- 
+
         fetch('https://localhost:7276/api/Order/create', {
             method: 'POST',
             headers: {
@@ -340,38 +369,30 @@
             },
             body: JSON.stringify(orderData)
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Ошибка при оформлении заказа');
-            }
-            return response.json();
-        })
-        .then(result => {
-            showOrderSuccess();
-            closeCheckoutModal();
-          
-            clearCart();
-        })
-        .catch(error => {
-            console.error('Error submitting order:', error);
-            alert('Ошибка при оформлении заказа: ' + error.message);
-
-          
-            submitBtn.textContent = originalText;
-            submitBtn.disabled = false;
-        });
-    }
-
-    function validateEmail(email) {
-       
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка при оформлении заказа');
+                }
+                return response.json();
+            })
+            .then(result => {
+                showOrderSuccess();
+                closeCheckoutModal();
+                clearCart();
+            })
+            .catch(error => {
+                console.error('Error submitting order:', error);
+                showQuantityErrorModal('Ошибка при оформлении заказа: ' + error.message);
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            });
     }
 
     function showOrderSuccess() {
-        alert('Заказ успешно оформлен! Информация отправлена на указанный email.');
+        showQuantityErrorModal('Заказ успешно оформлен! Информация отправлена на указанный email.');
     }
 
     function clearCart() {
-    
         const accessToken = localStorage.getItem('accessToken');
 
         fetch('https://localhost:7276/api/Cart/clear', {
@@ -380,20 +401,18 @@
                 'Authorization': 'Bearer ' + accessToken
             }
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Ошибка очистки корзины');
-            }
-          
-            currentCartItems = [];
-            showEmptyCart('Заказ успешно оформлен! Корзина очищена.');
-        })
-        .catch(error => {
-            console.error('Error clearing cart:', error);
-            
-            currentCartItems = [];
-            showEmptyCart('Заказ успешно оформлен!');
-        });
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка очистки корзины');
+                }
+                currentCartItems = [];
+                showEmptyCart('Заказ успешно оформлен! Корзина очищена.');
+            })
+            .catch(error => {
+                console.error('Error clearing cart:', error);
+                currentCartItems = [];
+                showEmptyCart('Заказ успешно оформлен!');
+            });
     }
 </script>
 
@@ -435,20 +454,15 @@
         box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
 
-    .empty-icon {
-        font-size: 80px;
-        margin-bottom: 20px;
-    }
+        .empty-cart h2 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
 
-    .empty-cart h2 {
-        color: #2c3e50;
-        margin-bottom: 10px;
-    }
-
-    .empty-cart p {
-        color: #666;
-        margin-bottom: 30px;
-    }
+        .empty-cart p {
+            color: #666;
+            margin-bottom: 30px;
+        }
 
     .btn-primary {
         background: #007bff;
@@ -515,6 +529,12 @@
         font-size: 14px;
     }
 
+    .item-stock {
+        color: #666;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
     .item-quantity {
         display: flex;
         align-items: center;
@@ -547,6 +567,11 @@
         text-align: center;
         font-size: 16px;
     }
+
+        .quantity-input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
 
     .item-total {
         font-weight: bold;
@@ -648,7 +673,7 @@
             text-decoration: none;
         }
 
-   
+    /* Модальные окна */
     .modal {
         display: none;
         position: fixed;
@@ -662,11 +687,11 @@
 
     .modal-content {
         background-color: white;
-        margin: 5% auto;
+        margin: 10% auto;
         padding: 30px;
         border-radius: 12px;
         width: 90%;
-        max-width: 600px;
+        max-width: 500px;
         box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         position: relative;
     }
@@ -736,7 +761,7 @@
         color: white;
     }
 
-    
+    /* Детали заказа */
     .order-summary {
         margin-bottom: 25px;
         padding: 20px;

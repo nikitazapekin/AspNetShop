@@ -22,6 +22,14 @@
                     <p id="productDescription"></p>
                 </div>
                 <div class="card-actions">
+                    <div class="quantity-selector">
+                        <label>Количество:</label>
+                        <div class="quantity-controls">
+                            <button class="quantity-btn minus-btn" id="decreaseQuantity">-</button>
+                            <input type="number" class="quantity-input" id="productQuantity" value="1" min="1">
+                            <button class="quantity-btn plus-btn" id="increaseQuantity">+</button>
+                        </div>
+                    </div>
                     <button class="btn-add-to-cart" id="addToCartBtn">Добавить в корзину</button>
                     <button class="btn-back" onclick="history.back()">Назад к каталогу</button>
                 </div>
@@ -30,12 +38,30 @@
     </div>
 </div>
 
+<!-- Модальное окно для ошибки количества -->
+<div id="quantityErrorModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeQuantityErrorModal()">&times;</span>
+        <h2>Ошибка количества</h2>
+        <div id="quantityErrorText"></div>
+        <div class="modal-buttons">
+            <button type="button" class="btn btn-primary" onclick="closeQuantityErrorModal()">OK</button>
+        </div>
+    </div>
+</div>
+
 <script>
-  
     let isAddingToCart = false;
+    let currentProduct = null;
+    let currentQuantity = 1;
 
     document.addEventListener('DOMContentLoaded', function () {
         loadProduct();
+
+        // Обработчики для кнопок количества
+        document.getElementById('decreaseQuantity').addEventListener('click', decreaseQuantity);
+        document.getElementById('increaseQuantity').addEventListener('click', increaseQuantity);
+        document.getElementById('productQuantity').addEventListener('change', handleQuantityInput);
     });
 
     function getProductIdFromUrl() {
@@ -61,6 +87,7 @@
             })
             .then(product => {
                 console.log('Received product:', product);
+                currentProduct = product;
                 displayProduct(product);
             })
             .catch(error => {
@@ -70,38 +97,80 @@
     }
 
     function displayProduct(product) {
-       
         document.getElementById('loadingMessage').style.display = 'none';
- 
+
         document.getElementById('productName').textContent = product.title || 'Название не указано';
         document.getElementById('productCategory').textContent = 'Рыбацкие удочки';
         document.getElementById('productPrice').textContent = (product.price ? parseInt(product.price).toLocaleString('ru-RU') : '0') + ' Руб';
         document.getElementById('productDescription').textContent = product.description || 'Описание отсутствует';
- 
+
         const productImage = document.getElementById('productImage');
         productImage.src = product.image || 'https://via.placeholder.com/500x400?text=No+Image';
         productImage.alt = product.title || 'Товар';
- 
+
         productImage.onerror = function () {
             this.src = 'https://via.placeholder.com/500x400?text=No+Image';
         };
- 
+
         const stockElement = document.getElementById('productStock');
         if (product.count > 0) {
             stockElement.innerHTML = '<span class="in-stock">В наличии: ' + product.count + ' шт.</span>';
             document.getElementById('addToCartBtn').disabled = false;
             document.getElementById('addToCartBtn').style.backgroundColor = '#007bff';
+
+            // Устанавливаем максимальное значение в поле ввода
+            document.getElementById('productQuantity').max = product.count;
         } else {
             stockElement.innerHTML = '<span class="out-of-stock">Нет в наличии</span>';
             document.getElementById('addToCartBtn').disabled = true;
             document.getElementById('addToCartBtn').style.backgroundColor = '#6c757d';
             document.getElementById('addToCartBtn').textContent = 'Нет в наличии';
+            document.getElementById('productQuantity').disabled = true;
         }
 
-     
         document.title = product.title + ' - Рыбацкие удочки';
- 
         document.getElementById('productContent').style.display = 'grid';
+    }
+
+    function decreaseQuantity() {
+        const quantityInput = document.getElementById('productQuantity');
+        let quantity = parseInt(quantityInput.value);
+        if (quantity > 1) {
+            quantity--;
+            quantityInput.value = quantity;
+            currentQuantity = quantity;
+        }
+    }
+
+    function increaseQuantity() {
+        const quantityInput = document.getElementById('productQuantity');
+        let quantity = parseInt(quantityInput.value);
+        const maxStock = currentProduct ? currentProduct.count : 1;
+
+        if (quantity < maxStock) {
+            quantity++;
+            quantityInput.value = quantity;
+            currentQuantity = quantity;
+        } else {
+            showQuantityErrorModal(`Максимальное доступное количество: ${maxStock} шт.`);
+        }
+    }
+
+    function handleQuantityInput(event) {
+        let quantity = parseInt(event.target.value);
+        const maxStock = currentProduct ? currentProduct.count : 1;
+
+        if (isNaN(quantity) || quantity < 1) {
+            quantity = 1;
+        }
+
+        if (quantity > maxStock) {
+            showQuantityErrorModal(`Максимальное доступное количество: ${maxStock} шт.`);
+            quantity = maxStock;
+        }
+
+        event.target.value = quantity;
+        currentQuantity = quantity;
     }
 
     function showError(message) {
@@ -113,18 +182,17 @@
         document.getElementById('errorMessage').style.textAlign = 'center';
         document.getElementById('errorMessage').style.fontSize = '18px';
     }
-     
+
     document.getElementById('addToCartBtn').addEventListener('click', function () {
         if (isAddingToCart) {
-            return; 
+            return;
         }
 
         const productId = getProductIdFromUrl();
-        addToCart(productId);
+        addToCart(productId, currentQuantity);
     });
 
-    function addToCart(productId) {
-       
+    function addToCart(productId, quantity) {
         if (isAddingToCart) {
             return;
         }
@@ -136,9 +204,9 @@
             window.location.href = '/signin';
             return;
         }
- 
+
         isAddingToCart = true;
- 
+
         const addButton = document.getElementById('addToCartBtn');
         const originalText = addButton.textContent;
         addButton.textContent = 'Добавляем...';
@@ -153,7 +221,7 @@
             },
             body: JSON.stringify({
                 tovarId: parseInt(productId),
-                quantity: 1
+                quantity: quantity
             })
         })
             .then(response => {
@@ -171,36 +239,38 @@
             })
             .then(purchase => {
                 console.log('Товар добавлен в корзину:', purchase);
- 
-                showSuccessMessage('Товар успешно добавлен в корзину!');
- 
-                updateStockAfterAdd(1);  
- 
+
+                showSuccessMessage(`Товар успешно добавлен в корзину! (${quantity} шт.)`);
+
+                updateStockAfterAdd(quantity);
+
                 addButton.textContent = 'Добавлено в корзину';
                 addButton.style.backgroundColor = '#28a745';
                 addButton.disabled = true;
- 
+
+                // Сбрасываем количество после успешного добавления
+                document.getElementById('productQuantity').value = 1;
+                currentQuantity = 1;
+
                 setTimeout(() => {
                     resetAddButton();
                 }, 3000);
             })
             .catch(error => {
                 console.error('Error adding to cart:', error);
-                 
+
                 if (error.message.includes('недостаточно') || error.message.includes('не найден')) {
-                    showErrorMessage('Не удалось добавить товар в корзину: ' + error.message);
+                    showQuantityErrorModal('Не удалось добавить товар в корзину: ' + error.message);
                 } else if (error.message.includes('Неавторизованный')) {
                     alert('Для добавления товара в корзину необходимо авторизоваться');
                     window.location.href = '/signin';
                 } else {
-                    showErrorMessage('Ошибка при добавлении в корзину: ' + error.message);
+                    showQuantityErrorModal('Ошибка при добавлении в корзину: ' + error.message);
                 }
 
-            
                 resetAddButton();
             })
             .finally(() => {
-             
                 isAddingToCart = false;
             });
     }
@@ -213,7 +283,6 @@
     }
 
     function updateStockAfterAdd(quantityAdded) {
-       
         const stockElement = document.getElementById('productStock');
         const currentStockText = stockElement.textContent;
         const currentStockMatch = currentStockText.match(/В наличии: (\d+) шт\./);
@@ -224,17 +293,23 @@
 
             if (newStock > 0) {
                 stockElement.innerHTML = '<span class="in-stock">В наличии: ' + newStock + ' шт.</span>';
+                // Обновляем максимальное значение в поле ввода
+                document.getElementById('productQuantity').max = newStock;
+                // Обновляем данные продукта
+                if (currentProduct) {
+                    currentProduct.count = newStock;
+                }
             } else {
                 stockElement.innerHTML = '<span class="out-of-stock">Нет в наличии</span>';
                 document.getElementById('addToCartBtn').disabled = true;
                 document.getElementById('addToCartBtn').style.backgroundColor = '#6c757d';
                 document.getElementById('addToCartBtn').textContent = 'Нет в наличии';
+                document.getElementById('productQuantity').disabled = true;
             }
         }
     }
 
     function showSuccessMessage(message) {
-        
         let notification = document.getElementById('successNotification');
         if (!notification) {
             notification = document.createElement('div');
@@ -258,42 +333,27 @@
         notification.textContent = message;
         notification.style.display = 'block';
 
-        
         setTimeout(() => {
             notification.style.display = 'none';
         }, 3000);
     }
 
-    function showErrorMessage(message) {
-       
-        let notification = document.getElementById('errorNotification');
-        if (!notification) {
-            notification = document.createElement('div');
-            notification.id = 'errorNotification';
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: #dc3545;
-                color: white;
-                padding: 15px 20px;
-                border-radius: 6px;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-                z-index: 1000;
-                font-weight: 500;
-                max-width: 300px;
-            `;
-            document.body.appendChild(notification);
-        }
-
-        notification.textContent = message;
-        notification.style.display = 'block';
-
-      
-        setTimeout(() => {
-            notification.style.display = 'none';
-        }, 5000);
+    function showQuantityErrorModal(message) {
+        document.getElementById('quantityErrorText').textContent = message;
+        document.getElementById('quantityErrorModal').style.display = 'block';
     }
+
+    function closeQuantityErrorModal() {
+        document.getElementById('quantityErrorModal').style.display = 'none';
+    }
+
+    // Закрытие модального окна при клике вне его
+    window.addEventListener('click', function (event) {
+        const modal = document.getElementById('quantityErrorModal');
+        if (event.target === modal) {
+            closeQuantityErrorModal();
+        }
+    });
 </script>
 
 <style>
@@ -386,8 +446,71 @@
     .card-actions {
         margin-top: 30px;
         display: flex;
+        flex-direction: column;
         gap: 15px;
     }
+
+    .quantity-selector {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 10px;
+    }
+
+        .quantity-selector label {
+            font-weight: 500;
+            color: #2c3e50;
+            min-width: 100px;
+        }
+
+    .quantity-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .quantity-btn {
+        width: 35px;
+        height: 35px;
+        border: 2px solid #007bff;
+        background: white;
+        color: #007bff;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        transition: all 0.3s;
+    }
+
+        .quantity-btn:hover {
+            background: #007bff;
+            color: white;
+        }
+
+        .quantity-btn:disabled {
+            border-color: #ccc;
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+            .quantity-btn:disabled:hover {
+                background: white;
+                color: #ccc;
+            }
+
+    .quantity-input {
+        width: 60px;
+        height: 35px;
+        border: 2px solid #e9ecef;
+        border-radius: 6px;
+        text-align: center;
+        font-size: 16px;
+    }
+
+        .quantity-input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
 
     .btn-add-to-cart {
         background: #007bff;
@@ -398,7 +521,6 @@
         font-size: 16px;
         cursor: pointer;
         transition: background 0.3s;
-        flex: 1;
     }
 
         .btn-add-to-cart:hover {
@@ -425,5 +547,59 @@
             background: #545b62;
         }
 
-    
+    /* Модальное окно */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+        background-color: white;
+        margin: 10% auto;
+        padding: 30px;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        position: relative;
+    }
+
+    .close {
+        position: absolute;
+        right: 20px;
+        top: 15px;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        color: #aaa;
+    }
+
+        .close:hover {
+            color: #000;
+        }
+
+    .modal-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 25px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background: #007bff;
+        color: white;
+    }
 </style>
