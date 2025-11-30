@@ -13,8 +13,7 @@
         <div class="loading">Загрузка корзины...</div>
     </div>
 </div>
-
-<!-- Модальное окно для ошибки количества -->
+ 
 <div id="quantityErrorModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeQuantityErrorModal()">&times;</span>
@@ -25,8 +24,7 @@
         </div>
     </div>
 </div>
-
-<!-- Модальное окно оформления заказа -->
+ 
 <div id="checkoutModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeCheckoutModal()">&times;</span>
@@ -233,9 +231,9 @@
                 return response.json();
             })
             .then(updatedItem => {
-                // Обновляем UI
+                
                 updateCartItemUI(purchaseId, updatedItem);
-                // Перезагружаем корзину для обновления всех данных
+           
                 loadCart();
             })
             .catch(error => {
@@ -245,7 +243,7 @@
                 } else {
                     showQuantityErrorModal('Ошибка при обновлении количества: ' + error.message);
                 }
-                // Перезагружаем корзину для синхронизации
+               
                 loadCart();
             });
     }
@@ -672,8 +670,7 @@
             color: white;
             text-decoration: none;
         }
-
-    /* Модальные окна */
+ 
     .modal {
         display: none;
         position: fixed;
@@ -760,8 +757,7 @@
         background: #28a745;
         color: white;
     }
-
-    /* Детали заказа */
+ 
     .order-summary {
         margin-bottom: 25px;
         padding: 20px;

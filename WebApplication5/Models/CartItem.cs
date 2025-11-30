@@ -9,7 +9,7 @@
         public string ImageUrl { get; set; }
         public decimal TotalPrice => Price * Quantity;
 
-       
+
 
     }
 }

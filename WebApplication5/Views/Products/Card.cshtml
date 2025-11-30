@@ -37,8 +37,7 @@
         </div>
     </div>
 </div>
-
-<!-- Модальное окно для ошибки количества -->
+ 
 <div id="quantityErrorModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeQuantityErrorModal()">&times;</span>
@@ -57,8 +56,7 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         loadProduct();
-
-        // Обработчики для кнопок количества
+ 
         document.getElementById('decreaseQuantity').addEventListener('click', decreaseQuantity);
         document.getElementById('increaseQuantity').addEventListener('click', increaseQuantity);
         document.getElementById('productQuantity').addEventListener('change', handleQuantityInput);
@@ -118,7 +116,7 @@
             document.getElementById('addToCartBtn').disabled = false;
             document.getElementById('addToCartBtn').style.backgroundColor = '#007bff';
 
-            // Устанавливаем максимальное значение в поле ввода
+        
             document.getElementById('productQuantity').max = product.count;
         } else {
             stockElement.innerHTML = '<span class="out-of-stock">Нет в наличии</span>';
@@ -247,8 +245,7 @@
                 addButton.textContent = 'Добавлено в корзину';
                 addButton.style.backgroundColor = '#28a745';
                 addButton.disabled = true;
-
-                // Сбрасываем количество после успешного добавления
+ 
                 document.getElementById('productQuantity').value = 1;
                 currentQuantity = 1;
 
@@ -293,9 +290,9 @@
 
             if (newStock > 0) {
                 stockElement.innerHTML = '<span class="in-stock">В наличии: ' + newStock + ' шт.</span>';
-                // Обновляем максимальное значение в поле ввода
+                
                 document.getElementById('productQuantity').max = newStock;
-                // Обновляем данные продукта
+              
                 if (currentProduct) {
                     currentProduct.count = newStock;
                 }
@@ -346,8 +343,7 @@
     function closeQuantityErrorModal() {
         document.getElementById('quantityErrorModal').style.display = 'none';
     }
-
-    // Закрытие модального окна при клике вне его
+ 
     window.addEventListener('click', function (event) {
         const modal = document.getElementById('quantityErrorModal');
         if (event.target === modal) {
@@ -546,8 +542,7 @@
         .btn-back:hover {
             background: #545b62;
         }
-
-    /* Модальное окно */
+ 
     .modal {
         display: none;
         position: fixed;
