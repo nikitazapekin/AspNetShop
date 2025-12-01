@@ -17,7 +17,7 @@
 <div id="quantityErrorModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeQuantityErrorModal()">&times;</span>
-        <h2>Ошибка количества</h2>
+        <h2>Заказ оформлен!</h2>
         <div id="quantityErrorText"></div>
         <div class="modal-buttons">
             <button type="button" class="btn btn-primary" onclick="closeQuantityErrorModal()">OK</button>
@@ -251,10 +251,7 @@
     function removeFromCart(purchaseId) {
         const accessToken = localStorage.getItem('accessToken');
 
-        if (!confirm('Удалить товар из корзины?')) {
-            return;
-        }
-
+     
         fetch(`https://localhost:7276/api/Cart/remove/${purchaseId}`, {
             method: 'DELETE',
             headers: {
